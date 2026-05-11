@@ -4,115 +4,175 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marktplatz — Die Unternehmensimmobilie</title>
+<meta name="description" content="Live-Marktplatz für Industrie- und Logistikimmobilien. KI-bewertet, direkt vom Eigentümer, kein Makler.">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
 <style>
 :root{
-  --ink:#080C10;--ink2:#0E141C;--ink3:#151E28;--ink4:#1C2735;--ink5:#243040;
-  --cyan:#00E5C8;--cyan2:#00B89E;
-  --cdim:rgba(0,229,200,.1);--cbrd:rgba(0,229,200,.22);
-  --w:#fff;--w60:rgba(255,255,255,.6);--w35:rgba(255,255,255,.35);
-  --w15:rgba(255,255,255,.15);--w08:rgba(255,255,255,.08);
-  --red:#EF4444;--amber:#F59E0B;
-  --grid:rgba(255,255,255,.038);
+  --ink:#080C10;--ink2:#0E141C;--ink3:#151E28;--ink4:#1C2735;
+  --cyan:#00E5C8;--cyan2:#00B89E;--cbrd:rgba(0,229,200,.22);--cdim:rgba(0,229,200,.09);
+  --w:#fff;--w60:rgba(255,255,255,.6);--w35:rgba(255,255,255,.35);--w08:rgba(255,255,255,.08);
+  --red:#EF4444;--amber:#F59E0B;--grid:rgba(255,255,255,.035);
+  --nav:56px;--filter:52px;--top:108px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--ink);color:var(--w);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.65;overflow-x:hidden}
+html{height:100%}
+body{background:var(--ink);color:var(--w);font-family:'DM Sans',sans-serif;font-size:14px;overflow:hidden;height:100vh}
 a{text-decoration:none;color:inherit}
-.grid-bg{background-image:repeating-linear-gradient(0deg,var(--grid) 0,var(--grid) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,var(--grid) 0,var(--grid) 1px,transparent 1px,transparent 40px)}
 
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--w08);display:flex;align-items:center;padding:0 2rem;gap:1.5rem}
-.logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav);background:rgba(8,12,16,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--w08);display:flex;align-items:center;padding:0 1.5rem;gap:1.25rem}
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0;text-decoration:none}
 .lm{width:28px;height:28px;background:var(--cyan);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--ink)}
-.lt{font-size:12px;font-weight:500}
+.lt{font-size:12px;font-weight:500;color:var(--w)}
 .ls{font-size:7.5px;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase}
-.nav-links{display:flex;gap:1.5rem;margin-left:auto}
+.nav-links{display:flex;gap:1.25rem;margin-left:1rem}
 .nav-links a{font-size:12px;color:var(--w35);transition:color .2s}
-.nav-links a:hover,.nav-links a.active{color:var(--cyan)}
-.btn-sm-nav{background:var(--cyan);color:var(--ink);padding:6px 16px;border-radius:4px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
-
-/* ── LIVE DOT ── */
+.nav-links a:hover,.nav-links a.cur{color:var(--cyan)}
+.search-box{position:relative;margin-left:auto}
+.search-input{background:var(--ink3);border:1px solid var(--w08);border-radius:6px;padding:6px 12px 6px 32px;font-size:12px;color:var(--w);width:220px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,width .3s}
+.search-input::placeholder{color:var(--w35)}
+.search-input:focus{border-color:var(--cbrd);width:280px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--w35);font-size:13px;pointer-events:none}
+.nav-btn{background:var(--cyan);color:var(--ink);padding:7px 16px;border-radius:5px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);display:inline-block;animation:pulse 2s ease-in-out infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,200,.5)}50%{box-shadow:0 0 0 5px rgba(0,229,200,0)}}
 
 /* ── FILTER BAR ── */
-.filter-bar{padding:0 2rem;height:52px;background:var(--ink2);border-bottom:1px solid var(--w08);display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;position:sticky;top:56px;z-index:100}
-.filter-label{font-size:9px;font-weight:500;color:var(--w35);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
-.chip{background:none;border:1px solid var(--w08);color:var(--w60);padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0}
-.chip:hover,.chip.active{background:var(--cyan);color:var(--ink);border-color:var(--cyan)}
-.fdiv{width:1px;height:16px;background:var(--w08);flex-shrink:0}
-.view-toggle{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
-.vtb{padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;border:1px solid var(--w08);color:var(--w35);background:none;font-family:'DM Sans',sans-serif;transition:all .15s}
-.vtb.active{background:var(--cdim);color:var(--cyan);border-color:var(--cbrd)}
+.fbar{position:fixed;top:var(--nav);left:0;right:0;z-index:200;height:var(--filter);background:var(--ink2);border-bottom:1px solid var(--w08);display:flex;align-items:center;padding:0 1.5rem;gap:8px;overflow-x:auto}
+.fbar::-webkit-scrollbar{display:none}
+.flabel{font-size:9px;font-weight:500;color:var(--w35);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.chip{background:none;border:1px solid var(--w08);color:var(--w60);padding:4px 11px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.chip:hover{border-color:var(--w35);color:var(--w)}
+.chip.on{background:var(--cyan);color:var(--ink);border-color:var(--cyan)}
+.chip.on:hover{background:var(--cyan2)}
+.fdiv{width:1px;height:16px;background:var(--w08);flex-shrink:0;margin:0 2px}
+.sort-sel{background:var(--ink3);border:1px solid var(--w08);color:var(--w60);padding:4px 10px;border-radius:5px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.vtoggle{display:flex;gap:3px;margin-left:auto;flex-shrink:0}
+.vtb{padding:5px 10px;border-radius:4px;font-size:11px;cursor:pointer;border:1px solid var(--w08);color:var(--w35);background:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.vtb.on{background:var(--cdim);color:var(--cyan);border-color:var(--cbrd)}
+.count-lbl{font-size:11px;color:var(--w35);white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px}
 
-/* ── MAIN LAYOUT ── */
-.mp-layout{display:grid;grid-template-columns:420px 1fr;height:calc(100vh - 108px);overflow:hidden;position:sticky;top:108px}
+/* ── MAIN ── */
+.main{position:fixed;top:var(--top);left:0;right:0;bottom:0;display:grid;grid-template-columns:380px 1fr}
 
 /* ── SIDEBAR ── */
-.sidebar{overflow-y:auto;border-right:1px solid var(--w08);background:var(--ink2)}
-.sidebar::-webkit-scrollbar{width:3px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--w08);border-radius:2px}
-.sidebar-header{padding:14px 16px;border-bottom:1px solid var(--w08);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--ink2);z-index:10}
-.sidebar-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--w35)}
+.sb{overflow-y:auto;border-right:1px solid var(--w08);background:var(--ink2);display:flex;flex-direction:column}
+.sb::-webkit-scrollbar{width:3px}
+.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+.sb-head{padding:12px 14px;border-bottom:1px solid var(--w08);position:sticky;top:0;background:var(--ink2);z-index:10;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-title{font-size:11px;font-weight:500}
+.sb-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--w35)}
+.prop-list{flex:1}
 
-/* Property list item */
-.prop-item{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s;display:flex;gap:12px;align-items:flex-start}
-.prop-item:hover{background:rgba(255,255,255,.02)}
-.prop-item.selected{background:rgba(0,229,200,.05);border-left:2px solid var(--cyan)}
-.prop-thumb{width:68px;height:56px;border-radius:6px;background:var(--ink4);flex-shrink:0;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
-.prop-thumb-svg{width:100%;height:100%}
-.prop-info{flex:1;min-width:0}
-.prop-name{font-size:12px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prop-loc{font-size:10px;color:var(--w35);margin-bottom:6px}
-.prop-metrics-row{display:flex;gap:8px}
-.prop-metric{font-size:9.5px;color:var(--w60)}
-.prop-metric strong{color:var(--w);font-weight:500}
-.prop-price-row{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
-.prop-price{font-family:'DM Mono',monospace;font-size:13px;color:var(--cyan)}
-.prop-delta{font-size:9px;padding:1px 6px;border-radius:8px}
-.delta-up{color:var(--cyan);background:rgba(0,229,200,.1)}
-.delta-dn{color:var(--red);background:rgba(239,68,68,.1)}
-
-/* ── MAP ── */
-.map-panel{position:relative;background:#0A1420;overflow:hidden}
-.map-svg{width:100%;height:100%}
-
-/* ── DETAIL PANEL ── */
-.detail-panel{position:absolute;bottom:20px;right:20px;width:300px;background:var(--ink3);border:1px solid var(--cbrd);border-radius:10px;overflow:hidden;transform:translateY(120%);transition:transform .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.detail-panel.open{transform:translateY(0)}
-.detail-header{background:var(--ink2);padding:12px 14px;border-bottom:1px solid var(--w08);display:flex;align-items:center;justify-content:space-between}
-.detail-close{background:none;border:none;color:var(--w35);cursor:pointer;font-size:18px;line-height:1}
-.detail-body{padding:14px}
-.detail-price{font-family:'DM Mono',monospace;font-size:24px;color:var(--cyan);font-weight:500;margin:8px 0 4px}
-.detail-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
-.dm-cell{padding:8px;background:var(--ink4);border-radius:5px;text-align:center}
-.dm-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--w)}
-.dm-lbl{font-size:8.5px;color:var(--w35);margin-top:2px}
-.detail-btn{width:100%;background:var(--cyan);color:var(--ink);border:none;border-radius:5px;padding:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
-.detail-btn-ghost{width:100%;background:var(--cdim);color:var(--cyan);border:1px solid var(--cbrd);border-radius:5px;padding:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
-
-/* Tag */
-.tag{display:inline-flex;align-items:center;font-size:8.5px;font-weight:500;padding:2px 8px;border-radius:10px;letter-spacing:.04em}
+/* prop row */
+.prow{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;display:flex;gap:10px}
+.prow:hover{background:rgba(255,255,255,.025)}
+.prow.sel{background:rgba(0,229,200,.05);border-left:2px solid var(--cyan);padding-left:12px}
+.thumb{width:64px;height:52px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--ink4)}
+.pinfo{flex:1;min-width:0}
+.pname{font-size:11.5px;font-weight:500;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ploc{font-size:9.5px;color:var(--w35);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.pmr{display:flex;gap:8px;margin-bottom:5px}
+.pm{font-size:9.5px;color:var(--w60)}
+.pm strong{color:var(--w);font-weight:500}
+.ppr{display:flex;align-items:center;justify-content:space-between}
+.pprice{font-family:'DM Mono',monospace;font-size:12px;color:var(--cyan)}
+.ptag{font-size:8px;font-weight:500;padding:2px 6px;border-radius:8px}
 .tag-sell{background:var(--cyan);color:var(--ink)}
 .tag-rent{background:rgba(255,255,255,.1);color:var(--w60)}
-.tag-nego{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.tag-nego{background:rgba(245,158,11,.18);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.tag-req{background:var(--cdim);color:var(--cyan);border:1px solid var(--cbrd)}
+
+/* ── MAP ── */
+.map-wrap{position:relative;background:#091219;overflow:hidden}
+#leaflet-map{width:100%;height:100%}
+
+/* Leaflet dark overrides */
+.leaflet-tile-pane{filter:brightness(.85) saturate(.7) hue-rotate(180deg) invert(1) hue-rotate(180deg)}
+.leaflet-control-attribution{background:rgba(8,12,16,.8)!important;color:rgba(255,255,255,.35)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:rgba(0,229,200,.5)!important}
+.leaflet-control-zoom a{background:var(--ink3)!important;color:var(--w)!important;border-color:var(--w08)!important}
+.leaflet-control-zoom a:hover{background:var(--ink4)!important;color:var(--cyan)!important}
+
+/* Custom marker popup */
+.leaflet-popup-content-wrapper{background:var(--ink3);border:1px solid var(--cbrd);border-radius:8px;color:var(--w);box-shadow:0 8px 32px rgba(0,0,0,.5);padding:0}
+.leaflet-popup-content{margin:0;padding:0;font-family:'DM Sans',sans-serif}
+.leaflet-popup-tip-container{display:none}
+.leaflet-popup-close-button{color:var(--w35)!important;font-size:16px!important;padding:6px 10px!important}
+.leaflet-popup-close-button:hover{color:var(--w)!important}
+.pop-inner{padding:14px;min-width:220px}
+.pop-tag{font-size:8.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.pop-name{font-size:13px;font-weight:500;margin-bottom:3px;color:var(--w);line-height:1.3}
+.pop-loc{font-size:10px;color:var(--w60);margin-bottom:8px}
+.pop-price{font-family:'DM Mono',monospace;font-size:16px;color:var(--cyan);margin-bottom:6px}
+.pop-metrics{display:flex;gap:10px;margin-bottom:10px}
+.pop-m{font-size:10px;color:var(--w60)}.pop-m strong{color:var(--w);display:block;font-size:11px}
+.pop-btn{width:100%;background:var(--cyan);color:var(--ink);border:none;border-radius:5px;padding:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* cluster tooltip */
+.tip{position:absolute;background:rgba(8,12,16,.92);border:1px solid var(--cbrd);border-radius:6px;padding:6px 10px;font-size:10px;color:var(--w);pointer-events:none;z-index:50;display:none;max-width:200px;line-height:1.5;backdrop-filter:blur(8px)}
+
+/* ── DETAIL PANEL (slide-in) ── */
+.detail{position:absolute;bottom:0;right:0;width:340px;background:var(--ink3);border-top:1px solid var(--cbrd);border-left:1px solid var(--cbrd);border-radius:10px 0 0 0;transform:translateY(105%);transition:transform .32s cubic-bezier(.22,1,.36,1);z-index:100;max-height:85%;overflow-y:auto;box-shadow:-8px -8px 40px rgba(0,0,0,.5)}
+.detail.open{transform:translateY(0)}
+.detail::-webkit-scrollbar{width:3px}
+.detail::-webkit-scrollbar-thumb{background:var(--w08)}
+.det-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--w35);cursor:pointer;font-size:20px;line-height:1;z-index:1}
+.det-img{height:140px;background:var(--ink4);position:relative;overflow:hidden}
+.det-img-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,var(--grid) 0,var(--grid) 1px,transparent 1px,transparent 20px),repeating-linear-gradient(90deg,var(--grid) 0,var(--grid) 1px,transparent 1px,transparent 20px)}
+.det-body{padding:16px}
+.det-eyebrow{font-size:8.5px;color:var(--w35);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.det-name{font-size:16px;font-weight:500;margin-bottom:4px;line-height:1.3}
+.det-loc{font-size:11px;color:var(--w60);margin-bottom:12px;display:flex;align-items:center;gap:5px}
+.det-price{font-family:'DM Mono',monospace;font-size:26px;color:var(--cyan);line-height:1;margin-bottom:3px}
+.det-price-sub{font-size:10px;color:var(--w35);margin-bottom:14px}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.det-cell{padding:8px 10px;background:var(--ink4);border-radius:6px}
+.det-cell-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--w)}
+.det-cell-lbl{font-size:8.5px;color:var(--w35);margin-top:2px}
+.det-desc{font-size:12px;color:var(--w60);line-height:1.65;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--w08)}
+.det-feats{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.det-feat{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--w60)}
+.det-feat::before{content:'✓';color:var(--cyan);font-weight:500;flex-shrink:0}
+.det-btn{width:100%;background:var(--cyan);color:var(--ink);border:none;border-radius:6px;padding:11px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:7px}
+.det-btn-g{width:100%;background:var(--cdim);color:var(--cyan);border:1px solid var(--cbrd);border-radius:6px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.det-footer{margin-top:10px;padding-top:10px;border-top:1px solid var(--w08);display:flex;align-items:center;gap:8px}
+.det-agent{width:28px;height:28px;border-radius:50%;background:var(--cdim);border:1px solid var(--cbrd);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--cyan);flex-shrink:0}
+.det-agent-name{font-size:11px;font-weight:500}
+.det-agent-role{font-size:9.5px;color:var(--w35)}
 
 /* ── LIST VIEW ── */
-.list-view{display:none;padding:1.5rem 2rem;overflow-y:auto;height:calc(100vh - 108px);background:var(--ink)}
-.list-view.active{display:block}
-.list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
-.lcard{background:var(--ink3);border:1px solid var(--w08);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .2s}
-.lcard:hover{border-color:var(--cbrd)}
-.lcard-img{height:120px;background:var(--ink4);position:relative;overflow:hidden}
-.lcard-body{padding:14px}
-.lcard-footer{border-top:1px solid var(--w08);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
-.btn-xs{background:var(--cyan);color:var(--ink);border:none;border-radius:3px;padding:4px 10px;font-size:9.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.list-view{position:absolute;inset:0;overflow-y:auto;padding:1.25rem 1.5rem;background:var(--ink);display:none;grid-column:1/-1}
+.list-view.on{display:block}
+.list-view::-webkit-scrollbar{width:4px}
+.list-view::-webkit-scrollbar-thumb{background:var(--w08);border-radius:2px}
+.list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.lcard{background:var(--ink3);border:1px solid var(--w08);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s}
+.lcard:hover{border-color:var(--cbrd);transform:translateY(-2px)}
+.lcard-img{height:110px;background:var(--ink4);position:relative;overflow:hidden}
+.lcard-body{padding:12px}
+.lcard-footer{border-top:1px solid var(--w08);padding:9px 12px;display:flex;align-items:center;justify-content:space-between}
+.btn-xs{background:var(--cyan);color:var(--ink);border:none;border-radius:4px;padding:4px 10px;font-size:10px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* empty state */
+.empty{padding:3rem;text-align:center;color:var(--w35);font-size:13px}
+.empty-icon{font-size:32px;margin-bottom:12px}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .sb{display:none}
+  nav .nav-links{display:none}
+  .search-input{width:160px}
+  .search-input:focus{width:200px}
+}
 </style>
 </head>
 <body>
 
-<!-- ── NAV ── -->
+<!-- NAV -->
 <nav>
   <a href="landingpage_v2_journey.html" class="logo">
     <div class="lm">UI</div>
@@ -120,487 +180,111 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;background:rgba(
   </a>
   <div class="nav-links">
     <a href="landingpage_v2_journey.html">Startseite</a>
-    <a href="#" class="active">Marktplatz</a>
+    <a href="marketplace.html" class="cur">Marktplatz</a>
     <a href="landingpage_v2_journey.html#pricing">Preise</a>
     <a href="landingpage_v2_journey.html#step1">Bewertung</a>
   </div>
-  <button class="btn-sm-nav">Objekt bewerten</button>
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" id="search" type="text" placeholder="Stadt, PLZ oder Objektname …" oninput="doSearch(this.value)">
+  </div>
+  <button class="nav-btn" onclick="alert('Coming 2027 — jetzt vormerken!')">Objekt bewerten</button>
 </nav>
 
-<!-- ── FILTER BAR ── -->
-<div class="filter-bar">
-  <span class="filter-label">Filter</span>
-  <button class="chip active" onclick="filterBy(this,'typ','alle')">Alle Typen</button>
-  <button class="chip" onclick="filterBy(this,'typ','logistik')">Logistik</button>
-  <button class="chip" onclick="filterBy(this,'typ','produktion')">Produktion</button>
-  <button class="chip" onclick="filterBy(this,'typ','industrie')">Industrie</button>
-  <button class="chip" onclick="filterBy(this,'typ','kuehllager')">Kühllager</button>
+<!-- FILTER BAR -->
+<div class="fbar">
+  <span class="flabel">Typ</span>
+  <button class="chip on" data-g="typ" data-v="alle" onclick="filt(this)">Alle</button>
+  <button class="chip" data-g="typ" data-v="logistik" onclick="filt(this)">Logistik</button>
+  <button class="chip" data-g="typ" data-v="produktion" onclick="filt(this)">Produktion</button>
+  <button class="chip" data-g="typ" data-v="industrie" onclick="filt(this)">Industrie</button>
+  <button class="chip" data-g="typ" data-v="kuehllager" onclick="filt(this)">Kühllager</button>
   <div class="fdiv"></div>
-  <button class="chip active" onclick="filterBy(this,'preis','alle')">Alle Preise</button>
-  <button class="chip" onclick="filterBy(this,'preis','u10')">bis 10 Mio.</button>
-  <button class="chip" onclick="filterBy(this,'preis','10-30')">10–30 Mio.</button>
-  <button class="chip" onclick="filterBy(this,'preis','ue30')">über 30 Mio.</button>
+  <span class="flabel">Status</span>
+  <button class="chip on" data-g="status" data-v="alle" onclick="filt(this)">Alle</button>
+  <button class="chip" data-g="status" data-v="Verkauf" onclick="filt(this)">Verkauf</button>
+  <button class="chip" data-g="status" data-v="Miete" onclick="filt(this)">Miete</button>
+  <button class="chip" data-g="status" data-v="Verhandlung" onclick="filt(this)">Verhandlung</button>
   <div class="fdiv"></div>
-  <span id="count-label" style="font-size:11px;color:var(--w35);white-space:nowrap;flex-shrink:0"><span class="live-dot"></span> <span id="mp-count">16</span> Objekte</span>
-  <div class="view-toggle">
-    <button class="vtb active" id="btn-map" onclick="switchView('map')">🗺 Karte</button>
-    <button class="vtb" id="btn-list" onclick="switchView('list')">⊞ Liste</button>
+  <span class="flabel">Preis</span>
+  <button class="chip on" data-g="preis" data-v="alle" onclick="filt(this)">Alle</button>
+  <button class="chip" data-g="preis" data-v="u10" onclick="filt(this)">bis 10 Mio.</button>
+  <button class="chip" data-g="preis" data-v="10-30" onclick="filt(this)">10–30 Mio.</button>
+  <button class="chip" data-g="preis" data-v="ue30" onclick="filt(this)">über 30 Mio.</button>
+  <div class="fdiv"></div>
+  <select class="sort-sel" onchange="doSort(this.value)">
+    <option value="default">Sortierung: Relevanz</option>
+    <option value="price-asc">Preis aufsteigend</option>
+    <option value="price-desc">Preis absteigend</option>
+    <option value="sqm-desc">Fläche (groß → klein)</option>
+    <option value="year-desc">Neueste zuerst</option>
+  </select>
+  <div class="fdiv"></div>
+  <span class="count-lbl"><span class="live-dot"></span><span id="cnt">16</span> Objekte</span>
+  <div class="vtoggle">
+    <button class="vtb on" id="v-map" onclick="setView('map')">🗺 Karte</button>
+    <button class="vtb" id="v-list" onclick="setView('list')">⊞ Liste</button>
   </div>
 </div>
 
-<!-- ══════════════════
-  MAP + SIDEBAR LAYOUT
-══════════════════════ -->
-<div id="map-layout" class="mp-layout">
+<!-- MAIN -->
+<div class="main" id="main">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <span style="font-size:12px;font-weight:500">Aktuelle Angebote</span>
-      <span class="sidebar-count" id="sidebar-count">16 Objekte · DE</span>
+  <div class="sb">
+    <div class="sb-head">
+      <span class="sb-title">Aktuelle Objekte</span>
+      <span class="sb-count" id="sb-cnt">16 verfügbar</span>
     </div>
-    <div id="prop-list"></div>
+    <div class="prop-list" id="prop-list"></div>
   </div>
 
-  <!-- MAP PANEL -->
-  <div class="map-panel">
-    <svg id="de-svg" viewBox="0 0 640 760" width="100%" height="100%" style="display:block">
-      <defs>
-        <radialGradient id="mapBg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#0D1E2C"/>
-          <stop offset="100%" stop-color="#080C10"/>
-        </radialGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
+  <!-- MAP -->
+  <div class="map-wrap" id="map-wrap">
+    <div id="leaflet-map"></div>
+    <div class="tip" id="tip"></div>
 
-      <rect width="640" height="760" fill="url(#mapBg)"/>
-
-      <!-- Grid -->
-      <g stroke="rgba(255,255,255,.03)" stroke-width="0.5">
-        <line x1="0" y1="100" x2="640" y2="100"/><line x1="0" y1="200" x2="640" y2="200"/>
-        <line x1="0" y1="300" x2="640" y2="300"/><line x1="0" y1="400" x2="640" y2="400"/>
-        <line x1="0" y1="500" x2="640" y2="500"/><line x1="0" y1="600" x2="640" y2="600"/>
-        <line x1="0" y1="700" x2="640" y2="700"/>
-        <line x1="100" y1="0" x2="100" y2="760"/><line x1="200" y1="0" x2="200" y2="760"/>
-        <line x1="300" y1="0" x2="300" y2="760"/><line x1="400" y1="0" x2="400" y2="760"/>
-        <line x1="500" y1="0" x2="500" y2="760"/><line x1="600" y1="0" x2="600" y2="760"/>
-      </g>
-
-      <!-- Germany outline — detailed recognisable shape -->
-      <path d="
-        M248 28 L260 22 L274 20 L288 18 L302 22 L316 18 L332 24 L346 20 L360 26
-        L372 22 L386 28 L396 38 L404 52 L412 64 L418 78 L422 92 L426 108
-        L430 122 L434 136 L438 152 L440 168 L442 184 L443 198 L444 212
-        L444 226 L443 240 L440 254 L436 268 L430 281 L422 293 L412 303
-        L400 311 L386 317 L371 322 L356 326 L341 331 L326 337 L312 344
-        L299 352 L287 361 L276 371 L266 382 L257 393 L248 404 L240 414
-        L232 422 L224 429 L215 434 L206 437 L197 436 L188 432 L179 426
-        L170 418 L162 409 L155 399 L149 388 L145 377 L142 365 L140 353
-        L139 340 L138 327 L137 314 L135 300 L132 287 L128 274 L123 262
-        L118 250 L112 238 L107 226 L103 214 L100 201 L99 188 L99 175
-        L100 162 L103 149 L107 137 L113 125 L120 114 L127 103 L134 93
-        L140 82 L146 72 L151 62 L156 52 L162 43 L169 35 L178 28 L190 24
-        L204 22 L220 24 L234 26 L248 28 Z
-      " fill="#0E1C28" stroke="rgba(0,229,200,.2)" stroke-width="1.2"/>
-
-      <!-- Interior Bundesland lines -->
-      <g stroke="rgba(255,255,255,.05)" stroke-width="0.7" fill="none">
-        <line x1="248" y1="130" x2="435" y2="118"/>
-        <line x1="230" y1="210" x2="440" y2="198"/>
-        <line x1="218" y1="295" x2="438" y2="280"/>
-        <line x1="210" y1="375" x2="430" y2="360"/>
-        <line x1="295" y1="40" x2="278" y2="440"/>
-        <line x1="368" y1="35" x2="345" y2="420"/>
-      </g>
-
-      <!-- City labels -->
-      <g font-family="DM Sans,Arial,sans-serif" fill="rgba(255,255,255,.2)" font-size="10" text-anchor="middle">
-        <text x="240" y="96">Hamburg</text>
-        <text x="314" y="148">Berlin</text>
-        <text x="204" y="234">Dortmund</text>
-        <text x="198" y="264">Essen</text>
-        <text x="212" y="298">Köln</text>
-        <text x="264" y="332">Frankfurt</text>
-        <text x="248" y="396">Stuttgart</text>
-        <text x="358" y="440">München</text>
-        <text x="348" y="220">Leipzig</text>
-        <text x="340" y="270">Erfurt</text>
-        <text x="390" y="178">Dresden</text>
-        <text x="376" y="350">Nürnberg</text>
-        <text x="258" y="174">Hannover</text>
-        <text x="408" y="268">Chemnitz</text>
-      </g>
-
-      <!-- Autobahn highlights (subtle) -->
-      <g stroke="rgba(0,229,200,.07)" stroke-width="1" fill="none">
-        <path d="M240 96 Q260 120 264 332"/>   <!-- A1/A7 corridor -->
-        <path d="M314 148 Q295 260 264 332"/>  <!-- A9 -->
-        <path d="M204 234 Q230 290 264 332"/>  <!-- A45 -->
-      </g>
-
-      <!-- ═══ PROPERTY PINS ════════════════════ -->
-
-      <!-- 0: München A9 — featured, biggest -->
-      <g id="mpin-0" class="mp-pin" data-id="0" onclick="selectProp(0)" style="cursor:pointer">
-        <circle cx="358" cy="430" r="28" fill="rgba(0,229,200,.06)"><animate attributeName="r" values="28;38;28" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".06;0;.06" dur="3s" repeatCount="indefinite"/></circle>
-        <circle cx="358" cy="430" r="16" fill="rgba(0,229,200,.14)"/>
-        <circle cx="358" cy="430" r="7" fill="#00E5C8" filter="url(#glow)"/>
-        <rect x="316" y="408" width="84" height="18" rx="9" fill="#080C10" stroke="rgba(0,229,200,.6)" stroke-width="1"/>
-        <text x="358" y="420" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#00E5C8" font-weight="500">€ 38,5 Mio.</text>
-      </g>
-
-      <!-- 1: Hamburg -->
-      <g id="mpin-1" class="mp-pin" data-id="1" onclick="selectProp(1)" style="cursor:pointer">
-        <circle cx="237" cy="88" r="14" fill="rgba(0,229,200,.1)"/>
-        <circle cx="237" cy="88" r="6" fill="#00E5C8"/>
-        <rect x="198" y="70" width="78" height="16" rx="8" fill="#080C10" stroke="rgba(0,229,200,.45)" stroke-width="1"/>
-        <text x="237" y="81" text-anchor="middle" font-family="DM Mono,monospace" font-size="8.5" fill="#00E5C8">€ 21,0 Mio.</text>
-      </g>
-
-      <!-- 2: Dortmund (Miete) -->
-      <g id="mpin-2" class="mp-pin" data-id="2" onclick="selectProp(2)" style="cursor:pointer">
-        <circle cx="196" cy="228" r="13" fill="rgba(255,255,255,.05)"/>
-        <circle cx="196" cy="228" r="5" fill="rgba(255,255,255,.5)"/>
-        <rect x="162" y="212" width="68" height="14" rx="7" fill="#080C10" stroke="rgba(255,255,255,.2)" stroke-width="1"/>
-        <text x="196" y="222" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(255,255,255,.55)">6,40 €/m²</text>
-      </g>
-
-      <!-- 3: Essen -->
-      <g id="mpin-3" class="mp-pin" data-id="3" onclick="selectProp(3)" style="cursor:pointer">
-        <circle cx="186" cy="256" r="13" fill="rgba(0,229,200,.1)"/>
-        <circle cx="186" cy="256" r="5" fill="#00E5C8"/>
-        <rect x="148" y="240" width="76" height="14" rx="7" fill="#080C10" stroke="rgba(0,229,200,.4)" stroke-width="1"/>
-        <text x="186" y="250" text-anchor="middle" font-family="DM Mono,monospace" font-size="8.5" fill="#00E5C8">€ 12,8 Mio.</text>
-      </g>
-
-      <!-- 4: Frankfurt (Verhandlung) -->
-      <g id="mpin-4" class="mp-pin" data-id="4" onclick="selectProp(4)" style="cursor:pointer">
-        <circle cx="264" cy="326" r="14" fill="rgba(245,158,11,.1)"/>
-        <circle cx="264" cy="326" r="5" fill="#F59E0B"/>
-        <rect x="226" y="310" width="76" height="14" rx="7" fill="#080C10" stroke="rgba(245,158,11,.5)" stroke-width="1"/>
-        <text x="264" y="320" text-anchor="middle" font-family="DM Mono,monospace" font-size="8.5" fill="#F59E0B">€ 17,2 Mio.</text>
-      </g>
-
-      <!-- 5: Stuttgart -->
-      <g id="mpin-5" class="mp-pin" data-id="5" onclick="selectProp(5)" style="cursor:pointer">
-        <circle cx="245" cy="390" r="14" fill="rgba(0,229,200,.1)"/>
-        <circle cx="245" cy="390" r="5" fill="#00E5C8"/>
-        <rect x="207" y="374" width="76" height="14" rx="7" fill="#080C10" stroke="rgba(0,229,200,.4)" stroke-width="1"/>
-        <text x="245" y="384" text-anchor="middle" font-family="DM Mono,monospace" font-size="8.5" fill="#00E5C8">€ 28,4 Mio.</text>
-      </g>
-
-      <!-- 6: Leipzig -->
-      <g id="mpin-6" class="mp-pin" data-id="6" onclick="selectProp(6)" style="cursor:pointer">
-        <circle cx="340" cy="214" r="13" fill="rgba(0,229,200,.09)"/>
-        <circle cx="340" cy="214" r="4.5" fill="#00E5C8"/>
-        <rect x="304" y="200" width="72" height="13" rx="6" fill="#080C10" stroke="rgba(0,229,200,.35)" stroke-width="1"/>
-        <text x="340" y="209" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#00E5C8">€ 9,6 Mio.</text>
-      </g>
-
-      <!-- 7: Nürnberg -->
-      <g id="mpin-7" class="mp-pin" data-id="7" onclick="selectProp(7)" style="cursor:pointer">
-        <circle cx="372" cy="344" r="13" fill="rgba(0,229,200,.09)"/>
-        <circle cx="372" cy="344" r="4.5" fill="#00E5C8"/>
-        <rect x="336" y="330" width="72" height="13" rx="6" fill="#080C10" stroke="rgba(0,229,200,.35)" stroke-width="1"/>
-        <text x="372" y="339" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#00E5C8">€ 15,3 Mio.</text>
-      </g>
-
-      <!-- 8: Berlin -->
-      <g id="mpin-8" class="mp-pin" data-id="8" onclick="selectProp(8)" style="cursor:pointer">
-        <circle cx="312" cy="144" r="13" fill="rgba(0,229,200,.09)"/>
-        <circle cx="312" cy="144" r="4.5" fill="#00E5C8"/>
-        <rect x="276" y="130" width="72" height="13" rx="6" fill="#080C10" stroke="rgba(0,229,200,.35)" stroke-width="1"/>
-        <text x="312" y="139" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#00E5C8">€ 22,1 Mio.</text>
-      </g>
-
-      <!-- 9: Köln -->
-      <g id="mpin-9" class="mp-pin" data-id="9" onclick="selectProp(9)" style="cursor:pointer">
-        <circle cx="206" cy="292" r="12" fill="rgba(0,229,200,.08)"/>
-        <circle cx="206" cy="292" r="4.5" fill="#00E5C8"/>
-        <rect x="172" y="279" width="68" height="12" rx="6" fill="#080C10" stroke="rgba(0,229,200,.3)" stroke-width="1"/>
-        <text x="206" y="287" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#00E5C8">€ 7,8 Mio.</text>
-      </g>
-
-      <!-- 10: Dresden -->
-      <g id="mpin-10" class="mp-pin" data-id="10" onclick="selectProp(10)" style="cursor:pointer">
-        <circle cx="390" cy="175" r="12" fill="rgba(0,229,200,.08)"/>
-        <circle cx="390" cy="175" r="4.5" fill="#00E5C8"/>
-        <rect x="356" y="163" width="68" height="12" rx="6" fill="#080C10" stroke="rgba(0,229,200,.3)" stroke-width="1"/>
-        <text x="390" y="171" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#00E5C8">€ 11,2 Mio.</text>
-      </g>
-
-      <!-- 11: Hannover (Miete) -->
-      <g id="mpin-11" class="mp-pin" data-id="11" onclick="selectProp(11)" style="cursor:pointer">
-        <circle cx="259" cy="166" r="11" fill="rgba(255,255,255,.04)"/>
-        <circle cx="259" cy="166" r="4" fill="rgba(255,255,255,.45)"/>
-        <rect x="228" y="155" width="62" height="11" rx="5" fill="#080C10" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
-        <text x="259" y="163" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(255,255,255,.5)">5,20 €/m²</text>
-      </g>
-
-      <!-- 12: Coswig/A9 (from expose) -->
-      <g id="mpin-12" class="mp-pin" data-id="12" onclick="selectProp(12)" style="cursor:pointer">
-        <circle cx="338" cy="264" r="13" fill="rgba(0,229,200,.1)"/>
-        <circle cx="338" cy="264" r="5" fill="#00E5C8"/>
-        <rect x="298" y="249" width="80" height="13" rx="6" fill="#080C10" stroke="rgba(0,229,200,.45)" stroke-width="1"/>
-        <text x="338" y="258" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#00E5C8">Auf Anfrage</text>
-      </g>
-
-      <!-- 13: Duisburg (Miete) -->
-      <g id="mpin-13" class="mp-pin" data-id="13" onclick="selectProp(13)" style="cursor:pointer">
-        <circle cx="174" cy="248" r="11" fill="rgba(255,255,255,.04)"/>
-        <circle cx="174" cy="248" r="4" fill="rgba(255,255,255,.45)"/>
-        <rect x="144" y="238" width="60" height="11" rx="5" fill="#080C10" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
-        <text x="174" y="246" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(255,255,255,.5)">4,80 €/m²</text>
-      </g>
-
-      <!-- 14: Mannheim -->
-      <g id="mpin-14" class="mp-pin" data-id="14" onclick="selectProp(14)" style="cursor:pointer">
-        <circle cx="252" cy="356" r="12" fill="rgba(0,229,200,.08)"/>
-        <circle cx="252" cy="356" r="4.5" fill="#00E5C8"/>
-        <rect x="218" y="344" width="68" height="12" rx="6" fill="#080C10" stroke="rgba(0,229,200,.3)" stroke-width="1"/>
-        <text x="252" y="352" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#00E5C8">€ 8,9 Mio.</text>
-      </g>
-
-      <!-- 15: Augsburg -->
-      <g id="mpin-15" class="mp-pin" data-id="15" onclick="selectProp(15)" style="cursor:pointer">
-        <circle cx="320" cy="402" r="12" fill="rgba(0,229,200,.08)"/>
-        <circle cx="320" cy="402" r="4.5" fill="#00E5C8"/>
-        <rect x="286" y="390" width="68" height="12" rx="6" fill="#080C10" stroke="rgba(0,229,200,.3)" stroke-width="1"/>
-        <text x="320" y="398" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#00E5C8">€ 6,2 Mio.</text>
-      </g>
-
-      <!-- LEGEND -->
-      <g transform="translate(16,690)">
-        <rect width="210" height="60" rx="6" fill="rgba(8,12,16,.85)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-        <circle cx="20" cy="18" r="5" fill="#00E5C8"/>
-        <text x="32" y="22" font-family="DM Sans,Arial" font-size="9" fill="rgba(255,255,255,.5)">Zum Verkauf</text>
-        <circle cx="120" cy="18" r="5" fill="#F59E0B"/>
-        <text x="132" y="22" font-family="DM Sans,Arial" font-size="9" fill="rgba(255,255,255,.5)">In Verhandlung</text>
-        <circle cx="20" cy="42" r="5" fill="rgba(255,255,255,.4)"/>
-        <text x="32" y="46" font-family="DM Sans,Arial" font-size="9" fill="rgba(255,255,255,.5)">Zur Miete</text>
-        <circle cx="120" cy="42" r="5" fill="#00E5C8" opacity=".3"/>
-        <text x="132" y="46" font-family="DM Sans,Arial" font-size="9" fill="rgba(255,255,255,.5)">Auf Anfrage</text>
-      </g>
-
-      <!-- Object count badge -->
-      <rect x="16" y="16" width="120" height="28" rx="5" fill="rgba(8,12,16,.85)" stroke="rgba(0,229,200,.3)" stroke-width="1"/>
-      <circle cx="30" cy="30" r="3.5" fill="#00E5C8"><animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/></circle>
-      <text x="40" y="34" font-family="DM Mono,monospace" font-size="10" fill="#00E5C8" font-weight="500">16 Objekte · DE</text>
-    </svg>
-
-    <!-- Detail Panel -->
-    <div class="detail-panel" id="detail-panel">
-      <div class="detail-header">
-        <div>
-          <div style="font-size:11px;font-weight:500" id="det-name">—</div>
-          <div style="font-size:9.5px;color:var(--w35);margin-top:1px" id="det-loc">—</div>
+    <!-- Detail panel -->
+    <div class="detail" id="detail">
+      <button class="det-close" onclick="closeDetail()">×</button>
+      <div class="det-img" id="det-img">
+        <div class="det-img-grid"></div>
+        <div id="det-img-icon" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.35"></div>
+        <div id="det-tag" style="position:absolute;bottom:10px;left:10px"></div>
+      </div>
+      <div class="det-body">
+        <div class="det-eyebrow" id="det-type">—</div>
+        <div class="det-name" id="det-name">—</div>
+        <div class="det-loc" id="det-loc">—</div>
+        <div class="det-price" id="det-price">—</div>
+        <div class="det-price-sub" id="det-psub">—</div>
+        <div class="det-grid" id="det-grid"></div>
+        <div class="det-desc" id="det-desc">—</div>
+        <div class="det-feats" id="det-feats"></div>
+        <button class="det-btn">Exposé anfordern →</button>
+        <button class="det-btn-g">Besichtigung vereinbaren</button>
+        <div class="det-footer">
+          <div class="det-agent" id="det-av">MS</div>
+          <div><div class="det-agent-name" id="det-aname">Markus Schäfer</div><div class="det-agent-role">Senior Transaktionsberater</div></div>
         </div>
-        <button class="detail-close" onclick="closeDetail()">×</button>
-      </div>
-      <div class="detail-body">
-        <div id="det-tag-wrap" style="margin-bottom:8px"></div>
-        <div class="detail-price" id="det-price">—</div>
-        <div style="font-size:10px;color:var(--w35);margin-bottom:10px" id="det-sub">—</div>
-        <div class="detail-metrics" id="det-metrics"></div>
-        <button class="detail-btn">Exposé anfordern →</button>
-        <button class="detail-btn-ghost">Besichtigung vereinbaren</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ══════════════════
-  LIST VIEW
-══════════════════════ -->
-<div id="list-view" class="list-view">
-  <div class="list-grid" id="list-grid"></div>
-</div>
+  <!-- LIST VIEW -->
+  <div class="list-view" id="list-view">
+    <div class="list-grid" id="list-grid"></div>
+  </div>
 
+</div><!-- /main -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script>
-// ── DATA ──────────────────────────────────────────
-const PROPS = [
-  {id:0,name:'Logistikzentrum A9-Corridor',loc:'München, Bayern',sqm:'89.500',year:2019,h:'11 m',price:'€ 38,5 Mio.',delta:'+2,4 %',dc:'var(--cyan)',status:'Verkauf',typ:'logistik',preis:'ue30',pinId:'mpin-0'},
-  {id:1,name:'Kühllagerkomplex Hafen',loc:'Hamburg, HH',sqm:'14.600',year:2021,h:'12 m',price:'€ 21,0 Mio.',delta:'+4,7 %',dc:'var(--cyan)',status:'Verkauf',typ:'kuehllager',preis:'10-30',pinId:'mpin-1'},
-  {id:2,name:'Automatisiertes Hochregallager',loc:'Dortmund, NRW',sqm:'31.200',year:2023,h:'18 m',price:'6,40 €/m²',delta:'Frei',dc:'rgba(255,255,255,.5)',status:'Miete',typ:'logistik',preis:'u10',pinId:'mpin-2'},
-  {id:3,name:'Industriehalle Ruhrgebiet',loc:'Essen, NRW',sqm:'18.400',year:2006,h:'9 m',price:'€ 12,8 Mio.',delta:'−1,1 %',dc:'var(--red)',status:'Verkauf',typ:'industrie',preis:'10-30',pinId:'mpin-3'},
-  {id:4,name:'Cross-Docking Terminal FRA',loc:'Frankfurt, Hessen',sqm:'22.000',year:2014,h:'10 m',price:'€ 17,2 Mio.',delta:'Verh.',dc:'var(--amber)',status:'Verhandlung',typ:'produktion',preis:'10-30',pinId:'mpin-4'},
-  {id:5,name:'Logistikpark Stuttgart-Süd',loc:'Stuttgart, BW',sqm:'45.000',year:2018,h:'13 m',price:'€ 28,4 Mio.',delta:'+1,8 %',dc:'var(--cyan)',status:'Verkauf',typ:'logistik',preis:'10-30',pinId:'mpin-5'},
-  {id:6,name:'Distributionszentrum Leipzig',loc:'Leipzig, Sachsen',sqm:'12.800',year:2016,h:'9 m',price:'€ 9,6 Mio.',delta:'+3,1 %',dc:'var(--cyan)',status:'Verkauf',typ:'logistik',preis:'u10',pinId:'mpin-6'},
-  {id:7,name:'Produktionshalle Nürnberg',loc:'Nürnberg, Bayern',sqm:'21.500',year:2011,h:'10 m',price:'€ 15,3 Mio.',delta:'+0,9 %',dc:'var(--cyan)',status:'Verkauf',typ:'produktion',preis:'10-30',pinId:'mpin-7'},
-  {id:8,name:'Logistikhub Berlin-Ost',loc:'Berlin',sqm:'38.000',year:2020,h:'12 m',price:'€ 22,1 Mio.',delta:'+5,2 %',dc:'var(--cyan)',status:'Verkauf',typ:'logistik',preis:'10-30',pinId:'mpin-8'},
-  {id:9,name:'Gewerbeobjekt Köln-Deutz',loc:'Köln, NRW',sqm:'8.200',year:2009,h:'7 m',price:'€ 7,8 Mio.',delta:'+1,2 %',dc:'var(--cyan)',status:'Verkauf',typ:'industrie',preis:'u10',pinId:'mpin-9'},
-  {id:10,name:'Industriepark Dresden-Nord',loc:'Dresden, Sachsen',sqm:'16.400',year:2013,h:'11 m',price:'€ 11,2 Mio.',delta:'+2,7 %',dc:'var(--cyan)',status:'Verkauf',typ:'industrie',preis:'10-30',pinId:'mpin-10'},
-  {id:11,name:'Kühllager Hannover-Linden',loc:'Hannover, Nds.',sqm:'9.800',year:2017,h:'8 m',price:'5,20 €/m²',delta:'Frei',dc:'rgba(255,255,255,.5)',status:'Miete',typ:'kuehllager',preis:'u10',pinId:'mpin-11'},
-  {id:12,name:'Produktionshalle Coswig A9',loc:'Coswig (Anhalt), Sachsen-Anhalt',sqm:'4.177',year:1994,h:'8,5 m',price:'Auf Anfrage',delta:'15 €/m² BRW',dc:'rgba(255,255,255,.5)',status:'Verkauf',typ:'produktion',preis:'u10',pinId:'mpin-12'},
-  {id:13,name:'Logistikhalle Duisburg Hafen',loc:'Duisburg, NRW',sqm:'22.600',year:2008,h:'10 m',price:'4,80 €/m²',delta:'Frei',dc:'rgba(255,255,255,.5)',status:'Miete',typ:'logistik',preis:'u10',pinId:'mpin-13'},
-  {id:14,name:'Gewerbepark Mannheim-Süd',loc:'Mannheim, BW',sqm:'11.400',year:2005,h:'8 m',price:'€ 8,9 Mio.',delta:'+0,5 %',dc:'var(--cyan)',status:'Verkauf',typ:'industrie',preis:'u10',pinId:'mpin-14'},
-  {id:15,name:'Lager- & Produktionshalle Augsburg',loc:'Augsburg, Bayern',sqm:'7.600',year:2012,h:'9 m',price:'€ 6,2 Mio.',delta:'+1,9 %',dc:'var(--cyan)',status:'Verkauf',typ:'produktion',preis:'u10',pinId:'mpin-15'},
-];
+// ══════════════════════════════════════════════════════
+//  DATA — 16 realistic German industrial properties
+// ══════════════════════════════════════════════════════
 
-const filterState = {typ:'alle', preis:'alle'};
-let activeProp = null;
-
-// Tag HTML helper
-function tagHtml(s){
-  if(s==='Verkauf') return '<span class="tag tag-sell">Verkauf</span>';
-  if(s==='Miete') return '<span class="tag tag-rent">Miete</span>';
-  if(s==='Verhandlung') return '<span class="tag tag-nego">In Verhandlung</span>';
-  return `<span class="tag" style="background:rgba(0,229,200,.1);color:var(--cyan)">${s}</span>`;
-}
-
-// Thumbnail SVG per type
-function thumbSvg(typ){
-  const col = typ==='kuehllager'?'#00A8F0':typ==='produktion'?'#8B7FCC':'#00E5C8';
-  return `<svg viewBox="0 0 68 56" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
-    <rect width="68" height="56" fill="#1C2735"/>
-    <rect x="4" y="32" width="60" height="20" fill="${col}" opacity=".15"/>
-    <polygon points="4,32 18,14 32,32" fill="${col}" opacity=".7"/>
-    <polygon points="26,32 40,14 54,32" fill="${col}" opacity=".45"/>
-    <polygon points="48,32 58,14 64,32" fill="${col}" opacity=".22"/>
-    <rect x="8" y="40" width="12" height="12" fill="#080C10" opacity=".8"/>
-    <rect x="28" y="40" width="12" height="12" fill="#080C10" opacity=".8"/>
-    <rect x="48" y="40" width="12" height="12" fill="#080C10" opacity=".8"/>
-    <rect x="0" y="52" width="68" height="2" fill="${col}" opacity=".5"/>
-  </svg>`;
-}
-
-// Render sidebar list
-function renderList(props){
-  const el = document.getElementById('prop-list');
-  el.innerHTML = props.length === 0
-    ? '<div style="padding:24px;text-align:center;font-size:12px;color:rgba(255,255,255,.3)">Keine Objekte in dieser Auswahl.</div>'
-    : props.map(p=>`
-      <div class="prop-item" id="pitem-${p.id}" onclick="selectProp(${p.id})">
-        <div class="prop-thumb">${thumbSvg(p.typ)}</div>
-        <div class="prop-info">
-          <div class="prop-name">${p.name}</div>
-          <div class="prop-loc">${p.loc}</div>
-          <div class="prop-metrics-row">
-            <div class="prop-metric"><strong>${p.sqm} m²</strong></div>
-            <div class="prop-metric" style="color:rgba(255,255,255,.25)">·</div>
-            <div class="prop-metric"><strong>${p.year}</strong></div>
-            <div class="prop-metric" style="color:rgba(255,255,255,.25)">·</div>
-            <div class="prop-metric"><strong>${p.h}</strong></div>
-          </div>
-          <div class="prop-price-row">
-            <span class="prop-price">${p.price}</span>
-            <span class="prop-delta" style="background:rgba(0,229,200,.08);color:${p.dc}">${p.delta}</span>
-          </div>
-        </div>
-      </div>`).join('');
-}
-
-// Render list view grid
-function renderListView(props){
-  const el = document.getElementById('list-grid');
-  el.innerHTML = props.map(p=>`
-    <div class="lcard" onclick="selectProp(${p.id})">
-      <div class="lcard-img">${thumbSvg(p.typ)}</div>
-      <div class="lcard-body">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
-          <div style="font-size:12px;font-weight:500;flex:1">${p.name}</div>
-          ${tagHtml(p.status)}
-        </div>
-        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:8px">${p.loc}</div>
-        <div style="display:flex;gap:12px">
-          <div style="font-size:10px;color:rgba(255,255,255,.5)">Fläche <strong style="color:#fff;display:block;font-size:11px">${p.sqm} m²</strong></div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5)">Baujahr <strong style="color:#fff;display:block;font-size:11px">${p.year}</strong></div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5)">Höhe <strong style="color:#fff;display:block;font-size:11px">${p.h}</strong></div>
-        </div>
-      </div>
-      <div class="lcard-footer">
-        <span style="font-family:'DM Mono',monospace;font-size:13px;color:#00E5C8">${p.price}</span>
-        <button class="btn-xs">Exposé</button>
-      </div>
-    </div>`).join('') + `
-    <div class="lcard" style="border-style:dashed;border-color:rgba(0,229,200,.25);cursor:pointer;background:rgba(0,229,200,.03)" onclick="window.location='landingpage_v2_journey.html#pricing'">
-      <div style="height:100%;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;gap:10px">
-        <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,229,200,.1);border:1px solid rgba(0,229,200,.25);display:flex;align-items:center;justify-content:center;font-size:18px;color:#00E5C8">+</div>
-        <div style="font-size:13px;font-weight:500;color:#00E5C8">Ihr Objekt listen</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.35)">500 Investoren · 5.000+ Käufer</div>
-      </div>
-    </div>`;
-}
-
-// Select property
-function selectProp(id){
-  const p = PROPS.find(x=>x.id===id);
-  if(!p) return;
-  // Pin highlight
-  document.querySelectorAll('.mp-pin circle').forEach(c=>{ if(parseInt(c.getAttribute('r'))===7) c.setAttribute('r','5'); });
-  const pin = document.getElementById('mp-pin-'+id) || document.getElementById(p.pinId);
-  // Sidebar highlight
-  document.querySelectorAll('.prop-item').forEach(el=>{el.classList.remove('selected');el.style.borderLeft='';});
-  const sRow = document.getElementById('pitem-'+id);
-  if(sRow){sRow.classList.add('selected');sRow.scrollIntoView({block:'nearest',behavior:'smooth'});}
-  // Detail panel
-  document.getElementById('det-name').textContent = p.name;
-  document.getElementById('det-loc').textContent = `${p.loc} · ${p.sqm} m²`;
-  document.getElementById('det-tag-wrap').innerHTML = tagHtml(p.status);
-  document.getElementById('det-price').textContent = p.price;
-  document.getElementById('det-sub').textContent = `${p.year} · ${p.h} Hallenhöhe · ${p.delta}`;
-  document.getElementById('det-metrics').innerHTML = `
-    <div class="dm-cell"><div class="dm-val">${p.sqm} m²</div><div class="dm-lbl">Nutzfläche</div></div>
-    <div class="dm-cell"><div class="dm-val">${p.year}</div><div class="dm-lbl">Baujahr</div></div>
-    <div class="dm-cell"><div class="dm-val">${p.h}</div><div class="dm-lbl">Hallenhöhe</div></div>
-    <div class="dm-cell"><div class="dm-val">${p.typ.charAt(0).toUpperCase()+p.typ.slice(1)}</div><div class="dm-lbl">Typ</div></div>`;
-  document.getElementById('detail-panel').classList.add('open');
-  activeProp = id;
-}
-
-function closeDetail(){
-  document.getElementById('detail-panel').classList.remove('open');
-  document.querySelectorAll('.prop-item').forEach(el=>{el.classList.remove('selected');el.style.borderLeft='';});
-  activeProp = null;
-}
-
-// Filter
-function filterBy(btn, key, val){
-  document.querySelectorAll(`.chip[onclick*="'${key}'"]`).forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  filterState[key] = val;
-  applyFilter();
-}
-
-function applyFilter(){
-  const visible = PROPS.filter(p=>{
-    const okT = filterState.typ==='alle'||filterState.typ===p.typ;
-    const okP = filterState.preis==='alle'||filterState.preis===p.preis;
-    return okT&&okP;
-  });
-  PROPS.forEach(p=>{
-    const pin = document.getElementById(p.pinId);
-    if(pin) pin.style.display = visible.find(v=>v.id===p.id)?'':'none';
-  });
-  document.getElementById('mp-count').textContent = visible.length;
-  document.getElementById('sidebar-count').textContent = `${visible.length} Objekte · DE`;
-  renderList(visible);
-  renderListView(visible);
-  closeDetail();
-}
-
-// View toggle
-function switchView(mode){
-  const mapL = document.getElementById('map-layout');
-  const listL = document.getElementById('list-view');
-  const mb = document.getElementById('btn-map');
-  const lb = document.getElementById('btn-list');
-  if(mode==='map'){
-    mapL.style.display='grid'; listL.classList.remove('active');
-    mb.classList.add('active'); lb.classList.remove('active');
-  } else {
-    mapL.style.display='none'; listL.classList.add('active');
-    lb.classList.add('active'); mb.classList.remove('active');
-  }
-}
-
-// Init
-const all = PROPS;
-renderList(all);
-renderListView(all);
 </script>
 </body>
 </html>
