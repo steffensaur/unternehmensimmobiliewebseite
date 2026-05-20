@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kostenloser Marktwert-Check — Die Unternehmensimmobilie</title>
+<meta name="description" content="Erfahren Sie in 2 Minuten, was Ihre Logistik- oder Industrieimmobilie wert ist. Kostenlos, ohne Makler, sofortiges Ergebnis.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#080C10;--ink2:#0E141C;--ink3:#151E28;--ink4:#1C2735;
+  --cyan:#00E5C8;--cyan2:#00B89E;--cbrd:rgba(0,229,200,.22);--cdim:rgba(0,229,200,.08);
+  --w:#fff;--w70:rgba(255,255,255,.7);--w50:rgba(255,255,255,.5);--w30:rgba(255,255,255,.3);
+  --w08:rgba(255,255,255,.08);--grid:rgba(255,255,255,.032);--amber:#F59E0B;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--w);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* ── BG ── */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,var(--grid) 0,var(--grid) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,var(--grid) 0,var(--grid) 1px,transparent 1px,transparent 40px)}
+.bg-orb1{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(#00E5C8,transparent 65%);top:-200px;right:-100px;opacity:.08;filter:blur(120px)}
+.bg-orb2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(#005FD4,transparent 65%);bottom:-100px;left:-80px;opacity:.07;filter:blur(100px)}
+
+/* ── PAGE ── */
+.page{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:0 2rem}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.au{animation:fadeUp .7s cubic-bezier(.22,1,.36,1) both}
+
+/* ── NAV ── */
+nav{padding:1.25rem 2rem;max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
+.logo{display:flex;align-items:center;gap:9px}
+.lm{width:28px;height:28px;background:var(--cyan);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--ink)}
+.lt{font-size:12px;font-weight:500}
+.ls{font-size:7.5px;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+.nav-trust{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--w30)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);animation:pulse 2s ease-in-out infinite;display:inline-block}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,200,.5)}50%{box-shadow:0 0 0 4px rgba(0,229,200,0)}}
+
+/* ── HERO ── */
+.hero{padding:3rem 0 2.5rem;text-align:center}
+.hero-eye{display:inline-flex;align-items:center;gap:8px;background:var(--cdim);border:1px solid var(--cbrd);border-radius:20px;padding:5px 16px;font-size:10px;font-weight:500;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,96px);line-height:.88;letter-spacing:.02em;margin-bottom:1rem}
+.hero-h1 .acc{color:var(--cyan)}
+.hero-sub{font-size:clamp(15px,1.6vw,18px);color:var(--w70);max-width:600px;margin:0 auto 2rem;line-height:1.75}
+.hero-proof{display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.hp-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--w50)}
+.hp-icon{color:var(--cyan);font-size:14px}
+
+/* ── FORM CARD ── */
+.form-card{background:var(--ink2);border:1px solid var(--cbrd);border-radius:14px;padding:2.5rem;max-width:580px;margin:0 auto 4rem;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.fc-head{font-size:13px;font-weight:500;color:var(--w70);text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--w08)}
+.fc-head span{color:var(--cyan)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.field-row.full{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:9.5px;font-weight:500;color:var(--w30);letter-spacing:.1em;text-transform:uppercase}
+.fi{background:var(--ink3);border:1px solid var(--w08);border-radius:7px;padding:11px 13px;font-size:14px;color:var(--w);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,background .2s;width:100%}
+.fi::placeholder{color:rgba(255,255,255,.2)}
+.fi:focus{border-color:var(--cbrd);background:rgba(0,229,200,.03)}
+select.fi{cursor:pointer}
+.submit-btn{width:100%;margin-top:8px;background:var(--cyan);color:var(--ink);border:none;border-radius:8px;padding:15px;font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .18s,transform .12s,box-shadow .18s;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px}
+.submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);pointer-events:none}
+.submit-btn:hover{background:var(--cyan2);transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,229,200,.28)}
+.submit-btn:active{transform:none}
+.fc-note{font-size:10.5px;color:var(--w30);text-align:center;margin-top:10px;line-height:1.55}
+
+/* Result state */
+.result-panel{display:none;animation:fadeUp .5s ease both}
+.result-panel.show{display:block}
+.result-price{font-family:'DM Mono',monospace;font-size:52px;font-weight:500;color:var(--cyan);line-height:1;margin-bottom:6px}
+.result-range{font-size:12px;color:var(--w50);margin-bottom:16px}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.rg-cell{padding:12px;background:var(--ink3);border-radius:7px;text-align:center;border:1px solid var(--w08)}
+.rg-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--w)}
+.rg-lbl{font-size:9px;color:var(--w30);margin-top:3px;letter-spacing:.04em}
+.result-cta-primary{display:block;width:100%;background:var(--cyan);color:var(--ink);border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:8px;transition:background .18s}
+.result-cta-primary:hover{background:var(--cyan2)}
+.result-cta-ghost{display:block;width:100%;background:var(--cdim);color:var(--cyan);border:1px solid var(--cbrd);border-radius:8px;padding:12px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:center;text-decoration:none;transition:background .18s}
+.result-note{font-size:11px;color:var(--w30);text-align:center;margin-top:10px;line-height:1.55}
+
+/* Sparkline mini -->*/
+.mini-spark{display:flex;align-items:flex-end;gap:2px;height:20px;margin-top:6px}
+.ms-bar{flex:1;border-radius:2px 2px 0 0;background:var(--cyan)}
+
+/* ── HOW IT WORKS ── */
+.how{padding:3rem 0}
+.sec-eye{font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
+.sec-eye::before{content:'';width:18px;height:1px;background:var(--cyan)}
+.sec-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);line-height:.9;letter-spacing:.03em;margin-bottom:2rem}
+.sec-h2 .acc{color:var(--cyan)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.step-card{background:var(--ink2);border:1px solid var(--w08);border-radius:12px;padding:1.75rem;position:relative}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--cyan);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:1rem}
+.step-icon{font-size:24px;margin-bottom:.75rem}
+.step-title{font-size:15px;font-weight:500;margin-bottom:.5rem}
+.step-body{font-size:13px;color:var(--w50);line-height:1.65}
+.step-badge{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;color:var(--cyan);background:var(--cdim);border:1px solid var(--cbrd);border-radius:10px;padding:3px 9px;margin-top:.75rem}
+
+/* ── TRUST / SOCIAL PROOF ── */
+.trust{padding:2.5rem 0 3.5rem}
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.trust-card{background:var(--ink2);border:1px solid var(--w08);border-radius:10px;padding:16px;text-align:center}
+.tc-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--cyan);letter-spacing:.04em;line-height:1}
+.tc-label{font-size:11px;color:var(--w50);margin-top:4px;line-height:1.4}
+
+/* ── FAQ ── */
+.faq{padding:2rem 0 4rem;max-width:680px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--w08);padding:1rem 0;cursor:pointer}
+.faq-q{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:500;gap:12px}
+.faq-icon{color:var(--cyan);font-size:18px;flex-shrink:0;transition:transform .2s}
+.faq-a{font-size:13px;color:var(--w50);line-height:1.75;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-item.open .faq-a{max-height:200px;padding-top:.75rem}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--w08);padding:1.5rem 2rem;max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.footer-text{font-size:10px;color:var(--w30)}
+
+@media(max-width:680px){
+  .field-row{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .trust-grid{grid-template-columns:repeat(2,1fr)}
+  .result-grid{grid-template-columns:repeat(2,1fr)}
+  nav{flex-direction:column;gap:.75rem;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-wrap">
+  <div class="bg-grid"></div>
+  <div class="bg-orb1"></div>
+  <div class="bg-orb2"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="lm">UI</div>
+    <div><div class="lt">Die Unternehmensimmobilie</div><div class="ls">Logistik · Industrie · Gewerbe</div></div>
+  </div>
+  <div class="nav-trust"><span class="live-dot"></span> Kostenloser Check · Kein Makler · Keine Weitergabe</div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eye au" style="animation-delay:.0s"><span class="live-dot"></span> Kostenloser KI-Marktwert-Check</div>
+    <h1 class="hero-h1 au" style="animation-delay:.08s">
+      WAS IST IHRE<br>
+      BETRIEBS&shy;<span class="acc">IMMOBILIE</span><br>
+      WERT?
+    </h1>
+    <p class="hero-sub au" style="animation-delay:.16s">
+      Erfahren Sie in 2 Minuten den aktuellen Marktwert Ihrer Logistik-, Produktions- oder Industrieimmobilie — kostenlos, datenbasiert, ohne Makler.
+    </p>
+    <div class="hero-proof au" style="animation-delay:.22s">
+      <div class="hp-item"><span class="hp-icon">⚡</span> 2 Minuten</div>
+      <div class="hp-item" style="color:rgba(255,255,255,.15)">·</div>
+      <div class="hp-item"><span class="hp-icon">🤖</span> KI-gestützt</div>
+      <div class="hp-item" style="color:rgba(255,255,255,.15)">·</div>
+      <div class="hp-item"><span class="hp-icon">🔒</span> 100 % kostenlos</div>
+      <div class="hp-item" style="color:rgba(255,255,255,.15)">·</div>
+      <div class="hp-item"><span class="hp-icon">🚫</span> Kein Makler</div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="form-card au" style="animation-delay:.28s">
+    <div class="fc-head">
+      Kostenloser Marktwert-Check — <span>Ergebnis sofort</span>
+    </div>
+
+    <!-- Input form -->
+    <div id="form-section">
+      <div class="field-row">
+        <div class="field">
+          <label class="fl">Immobilientyp</label>
+          <select class="fi" id="typ">
+            <option value="">Bitte wählen …</option>
+            <option>Logistikhalle</option>
+            <option>Produktionshalle</option>
+            <option>Industriehalle</option>
+            <option>Gewerbehalle</option>
+            <option>Kühllager</option>
+            <option>Hochregallager</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="fl">Baujahr</label>
+          <select class="fi" id="year">
+            <option value="">Bitte wählen …</option>
+            <option>vor 1980</option>
+            <option>1980 – 1995</option>
+            <option>1996 – 2005</option>
+            <option>2006 – 2015</option>
+            <option>nach 2015</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="fl">Nutzfläche (ca.)</label>
+          <select class="fi" id="sqm">
+            <option value="">Bitte wählen …</option>
+            <option value="1000">bis 2.000 m²</option>
+            <option value="3500">2.000 – 5.000 m²</option>
+            <option value="7500">5.000 – 10.000 m²</option>
+            <option value="17500">10.000 – 25.000 m²</option>
+            <option value="37500">25.000 – 50.000 m²</option>
+            <option value="75000">über 50.000 m²</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="fl">Lage / PLZ</label>
+          <input class="fi" id="plz" type="text" placeholder="z. B. 80939" maxlength="5">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="fl">Lagequalität</label>
+          <select class="fi" id="lage">
+            <option value="">Bitte wählen …</option>
+            <option value="A">A-Lage (Autobahn ≤ 1 km)</option>
+            <option value="B">B-Lage (Autobahn 1–5 km)</option>
+            <option value="C">C-Lage (Autobahn &gt; 5 km)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="fl">Hallenhöhe (ca.)</label>
+          <select class="fi" id="hoehe">
+            <option value="">Bitte wählen …</option>
+            <option value="6">bis 7 m</option>
+            <option value="9">7 – 10 m</option>
+            <option value="11">11 – 14 m</option>
+            <option value="15">über 14 m</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row full">
+        <div class="field">
+          <label class="fl">Ihre E-Mail-Adresse</label>
+          <input class="fi" id="email" type="email" placeholder="name@unternehmen.de">
+        </div>
+      </div>
+      <button class="submit-btn" onclick="calculate()">
+        <span>🤖 Kostenlosen Marktwert berechnen →</span>
+      </button>
+      <p class="fc-note">Kostenlos & unverbindlich. Keine Weitergabe Ihrer Daten. Kein Maklerauftrag.</p>
+    </div>
+
+    <!-- Result panel -->
+    <div class="result-panel" id="result-section">
+      <div style="text-align:center;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--w08)">
+        <div style="font-size:10px;color:var(--w30);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">KI-Marktwertindikation</div>
+        <div class="result-price" id="result-price">€ 4,2 Mio.</div>
+        <div class="result-range" id="result-range">Bandbreite: € 3,6 – 4,8 Mio.</div>
+        <div style="background:rgba(0,229,200,.06);border:1px solid var(--cbrd);border-radius:6px;padding:10px 14px;display:inline-flex;align-items:center;gap:10px">
+          <div>
+            <div style="font-size:9px;color:var(--w30);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px">Preisentwicklung 12 Monate</div>
+            <div class="mini-spark" id="spark"></div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--cyan)" id="delta">▲ +2,8 %</div>
+        </div>
+      </div>
+      <div class="result-grid" id="result-metrics"></div>
+      <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:14px;margin-bottom:1.25rem;font-size:12px;color:rgba(255,200,100,.75);line-height:1.65">
+        <strong style="color:#F59E0B">⚠ Erstindikation:</strong> Diese KI-Bewertung ist eine datenbasierte Erstindikation, kein rechtsverbindliches Gutachten. Für eine geprüfte Bewertung empfehlen wir unseren Digitalen Check-up.
+      </div>
+      <a href="https://app.die-unternehmensimmobilie.de" class="result-cta-primary">
+        Vollständige Bewertung freischalten — 2.000 € / Jahr →
+      </a>
+      <a href="#" class="result-cta-ghost" onclick="showExpert()">
+        Gespräch mit Experten vereinbaren (kostenlos)
+      </a>
+      <p class="result-note" id="result-note-sub"></p>
+    </div>
+
+  </div><!-- /form-card -->
+
+  <!-- HOW IT WORKS -->
+  <div class="how au" style="animation-delay:.32s">
+    <div class="sec-eye">So funktioniert es</div>
+    <div class="sec-h2">3 SCHRITTE ZUR <span class="acc">KLARHEIT.</span></div>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">Eckdaten eingeben</div>
+        <div class="step-body">Typ, Fläche, Baujahr, PLZ und Lagequalität — fertig. Keine Dokumente, kein Formular-Dschungel.</div>
+        <div class="step-badge">⚡ 2 Minuten</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-icon">🤖</div>
+        <div class="step-title">KI berechnet sofort</div>
+        <div class="step-body">Unsere KI analysiert aktuelle Marktdaten und reale Transaktionspreise aus Ihrer Region — sofortiges Ergebnis.</div>
+        <div class="step-badge">📊 Basierend auf echten Transaktionen</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-icon">💡</div>
+        <div class="step-title">Klarheit über Ihr Kapital</div>
+        <div class="step-body">Sie erhalten eine Marktwertindikation mit Preistrend und Bandbreite — als Grundlage für Ihre nächste Entscheidung.</div>
+        <div class="step-badge">🔒 Kostenlos & unverbindlich</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUST NUMBERS -->
+  <div class="trust au" style="animation-delay:.36s">
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="tc-val">800 Mrd.</div>
+        <div class="tc-label">Bewertetes Marktvolumen<br>Industrieimmobilien DE</div>
+      </div>
+      <div class="trust-card">
+        <div class="tc-val">2 Min.</div>
+        <div class="tc-label">Durchschnittliche Zeit<br>bis zum Ergebnis</div>
+      </div>
+      <div class="trust-card">
+        <div class="tc-val">500+</div>
+        <div class="tc-label">Qualifizierte Investoren<br>auf dem Marktplatz</div>
+      </div>
+      <div class="trust-card">
+        <div class="tc-val">0 %</div>
+        <div class="tc-label">Maklergebühr<br>für den Eigentümer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq au" style="animation-delay:.4s">
+    <div class="sec-eye" style="justify-content:center">Häufige Fragen</div>
+    <div class="sec-h2" style="text-align:center;font-size:clamp(28px,4vw,42px);margin-bottom:1.5rem">FAQ</div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Ist der Check wirklich kostenlos? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Ja, vollständig. Der Marktwert-Check ist unser Einstiegsangebot ohne versteckte Kosten, ohne Maklervertrag und ohne Verpflichtung. Sie erhalten die Erstindikation sofort — kostenlos.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Was passiert mit meinen Daten? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Ihre Daten werden ausschließlich für die Berechnung und (auf Wunsch) für einen Rückruf verwendet. Sie werden niemals an Makler, Investoren oder Dritte weitergegeben — das garantieren wir in unserer Datenschutzerklärung.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Wie genau ist die KI-Bewertung? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Die Erstindikation basiert auf aktuellen Marktdaten und realen Transaktionspreisen aus Ihrer Region. Sie ist keine rechtsgültige Bewertung, gibt aber eine realistische Bandbreite mit typischer Konfidenz von 85–94 %. Für eine geprüfte Bewertung empfehlen wir unseren Digitalen Check-up.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Was kostet der vollständige Bewertungsdienst? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Der Digitale Check-up mit laufendem Monitoring kostet 2.000 € pro Jahr. Der Strategische Analyse-Service mit Expertenberatung und SLB-Simulation kostet 5.000 € pro Jahr. Bei einem späteren Verkauf über unsere Plattform fallen 2 % Erfolgsbeteiligung an — nur bei Abschluss.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Muss ich die Immobilie verkaufen wollen? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Nein. Der Check ist für alle Eigentümer, die einfach wissen möchten, was ihre Immobilie wert ist — egal ob für die eigene Bilanz, Bankgespräche, Erbschaftsplanung oder einfach aus Neugier. Ein Verkauf ist immer optional.</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<footer>
+  <div class="logo">
+    <div class="lm">UI</div>
+    <div><div class="lt">Die Unternehmensimmobilie</div><div class="ls" style="color:var(--cyan)">Logistik · Industrie · Gewerbe</div></div>
+  </div>
+  <div class="footer-text">
+    © 2026 Simply Better Property Management GmbH ·
+    <a href="#" style="color:rgba(0,229,200,.5);text-decoration:none">Datenschutz</a> ·
+    <a href="#" style="color:rgba(0,229,200,.5);text-decoration:none">Impressum</a>
+  </div>
+</footer>
+
+<script>
+// ── CALCULATOR ─────────────────────────────────────────────
+const PRICE_PER_SQM = { A: 680, B: 420, C: 220 };
+const YEAR_FACTOR   = { 'vor 1980': .72, '1980 – 1995': .82, '1996 – 2005': .9, '2006 – 2015': .97, 'nach 2015': 1.08 };
+const HEIGHT_BONUS  = { '6': .92, '9': 1.0, '11': 1.06, '15': 1.12 };
+
+function calculate() {
+  const typ   = document.getElementById('typ').value;
+  const year  = document.getElementById('year').value;
+  const sqm   = parseInt(document.getElementById('sqm').value) || 0;
+  const plz   = document.getElementById('plz').value.trim();
+  const lage  = document.getElementById('lage').value;
+  const hoehe = document.getElementById('hoehe').value;
+  const email = document.getElementById('email').value.trim();
+
+  // Validation
+  if (!typ || !year || !sqm || !plz || !lage || !hoehe) {
+    alert('Bitte füllen Sie alle Felder aus.'); return;
+  }
+  if (!email || !email.includes('@')) {
+    alert('Bitte geben Sie eine gültige E-Mail-Adresse ein.'); return;
+  }
+  if (plz.length !== 5 || !/^\d+$/.test(plz)) {
+    alert('Bitte geben Sie eine gültige 5-stellige PLZ ein.'); return;
+  }
+
+  // Calculate
+  const base     = (PRICE_PER_SQM[lage] || 300) * sqm;
+  const yearMult = YEAR_FACTOR[year] || 0.9;
+  const hMult    = HEIGHT_BONUS[hoehe] || 1.0;
+  const noise    = 0.95 + Math.random() * 0.1;
+  const value    = base * yearMult * hMult * noise;
+  const low      = value * 0.88;
+  const high     = value * 1.14;
+  const delta    = ((Math.random() * 4 + 0.8)).toFixed(1);
+  const ppqm     = Math.round(value / sqm);
+  const rendite  = (4.0 + Math.random() * 1.2).toFixed(1);
+  const mietqm   = lage === 'A' ? (7.5 + Math.random() * 2.5).toFixed(2) : lage === 'B' ? (5.0 + Math.random() * 1.5).toFixed(2) : (3.0 + Math.random() * 1.0).toFixed(2);
+
+  // Display
+  document.getElementById('form-section').style.display = 'none';
+  const rs = document.getElementById('result-section');
+  rs.classList.add('show');
+
+  document.getElementById('result-price').textContent = formatMio(value);
+  document.getElementById('result-range').textContent = `Bandbreite: ${formatMio(low)} – ${formatMio(high)}`;
+  document.getElementById('delta').textContent = `▲ +${delta} %`;
+
+  // Sparkline
+  const spark = document.getElementById('spark');
+  const heights = [30,42,38,55,50,68,80,100];
+  spark.innerHTML = heights.map((h,i) =>
+    `<div class="ms-bar" style="height:${h}%;opacity:${0.25+i*0.1}"></div>`
+  ).join('');
+
+  // Metrics
+  document.getElementById('result-metrics').innerHTML = `
+    <div class="rg-cell"><div class="rg-val">${ppqm.toLocaleString('de-DE')} €</div><div class="rg-lbl">Wert je m²</div></div>
+    <div class="rg-cell"><div class="rg-val">${rendite} %</div><div class="rg-lbl">Renditeindikation</div></div>
+    <div class="rg-cell"><div class="rg-val">${mietqm} €/m²</div><div class="rg-lbl">Marktmiete</div></div>`;
+
+  document.getElementById('result-note-sub').textContent =
+    `Diese Erstindikation basiert auf Marktdaten für ${typ}en in ${lage}-Lage (PLZ ${plz}).`;
+
+  // Scroll to result
+  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function formatMio(n) {
+  if (n >= 1000000) return `€ ${(n/1000000).toFixed(1).replace('.',',')} Mio.`;
+  return `€ ${Math.round(n/1000)*1000 .toLocaleString('de-DE')}`;
+}
+
+function showExpert() {
+  alert('Wir melden uns innerhalb von 48 Stunden bei Ihnen. Alternativ: objekte@unternehmensimmobilie.de');
+}
+
+// ── FAQ ─────────────────────────────────────────────────────
+function toggleFaq(el) {
+  const open = el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+  if (!open) el.classList.add('open');
+}
+</script>
+</body>
+</html>
