@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>INDUSTRIAL OS — Phase 1 // SIGMA Holding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Archivo+Black&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0E0F13;
+    --steel:#171A20;
+    --concrete:#202530;
+    --line:#2A2F3A;
+    --ash:#6C717C;
+    --ash-2:#9298A4;
+    --bone:#ECEEF3;
+    --lab:#8E6CF2;                       /* 24/7 Lab — Rahmen */
+    --lab-dim:rgba(142,108,242,.5);
+    --sigma:#5E93DB;                     /* SIGMA Holding — Angebotstext */
+    --sigma-line:rgba(94,147,219,.55);
+    --sigma-soft:rgba(94,147,219,.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--void);color:var(--bone);
+    font-family:"Inter",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:64px 64px,64px 64px;
+    background-position:-1px -1px;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(120% 80% at 50% -10%,transparent 40%,rgba(8,9,12,.85) 100%);
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+  .os-frame{max-width:1200px;margin:0 auto;border:1.5px solid var(--lab);background:transparent;position:relative;}
+  @media(max-width:1240px){.os-frame{border-left:none;border-right:none;}}
+  .lab-chip{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--lab);
+    border:1px solid var(--lab-dim);border-radius:3px;padding:2px 7px;text-transform:uppercase;}
+  .foot-brand{color:var(--lab);}
+
+  .mono{font-family:"Space Mono",monospace;}
+  .eyebrow{
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ash-2);margin:0 0 18px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--sigma);}
+
+  /* ---------- top status bar ---------- */
+  .topbar{
+    border-bottom:1px solid var(--lab-dim);position:sticky;top:0;z-index:30;
+    background:rgba(14,15,19,.82);backdrop-filter:blur(8px);
+  }
+  .topbar .row{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:11px 0;font-family:"Space Mono",monospace;font-size:11.5px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--ash-2);
+  }
+  .brandmark{display:flex;align-items:center;gap:10px;color:var(--bone);}
+  .brandmark b{font-family:"Archivo Black",sans-serif;letter-spacing:.02em;}
+  .bw{letter-spacing:.04em;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--lab);
+    box-shadow:0 0 0 0 var(--lab);animation:pulse 2s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(142,108,242,.55);}
+    70%{box-shadow:0 0 0 7px rgba(142,108,242,0);}
+    100%{box-shadow:0 0 0 0 rgba(142,108,242,0);}
+  }
+  .status-247{color:var(--lab);}
+  .topbar .hide-s{display:inline;}
+
+  /* ---------- hero ---------- */
+  .hero{padding:84px 0 64px;border-bottom:1px solid var(--line);position:relative;}
+  .hero h1{
+    font-family:"Archivo",sans-serif;font-weight:900;
+    font-size:clamp(26px,3.8vw,42px);line-height:1.04;letter-spacing:-.02em;
+    margin:0 0 26px;max-width:none;
+  }
+  .hero h1 .hl{color:var(--sigma);}
+  .hero p.lead{
+    font-size:clamp(16px,2.1vw,20px);color:var(--ash-2);max-width:62ch;margin:0;
+  }
+  .hero .meta{
+    margin-top:42px;display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);
+  }
+  .hero .meta .cell{
+    flex:1 1 180px;padding:16px 20px;border-right:1px solid var(--line);
+  }
+  .hero .meta .cell:last-child{border-right:0;}
+  .hero .meta .k{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ash);margin-bottom:6px;}
+  .hero .meta .v{font-family:"Archivo",sans-serif;font-weight:700;font-size:15px;color:var(--bone);}
+
+  section{padding:74px 0;border-bottom:1px solid var(--line);position:relative;}
+  h2.sec{
+    font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(26px,4vw,42px);
+    line-height:1.02;letter-spacing:-.015em;margin:0 0 18px;
+  }
+  .sec-sub{color:var(--ash-2);max-width:64ch;margin:0 0 8px;font-size:16.5px;}
+
+  /* ---------- schematic ---------- */
+  .schematic-shell{margin-top:38px;border:1px solid var(--line);background:
+    repeating-linear-gradient(90deg,transparent 0 31px,rgba(42,47,58,.5) 31px 32px),
+    linear-gradient(var(--steel),var(--steel));
+    background-blend-mode:normal;}
+  .schematic-head{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+    padding:12px 18px;border-bottom:1px solid var(--line);
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ash-2);
+  }
+  .schematic-scroll{overflow-x:auto;}
+  .schematic-scroll svg{display:block;width:100%;min-width:880px;height:auto;}
+  .scrollhint{display:none;font-family:"Space Mono",monospace;font-size:10.5px;
+    letter-spacing:.14em;color:var(--ash);padding:8px 18px;text-transform:uppercase;}
+
+  svg text{font-family:"Space Mono",monospace;fill:var(--bone);}
+  .n-label{font-size:11px;letter-spacing:.12em;fill:var(--ash-2);text-transform:uppercase;}
+  .n-title{font-family:"Archivo",sans-serif;font-weight:800;font-size:15px;fill:var(--bone);}
+  .n-sub{font-size:10.5px;fill:var(--ash);}
+  .flowline{fill:none;stroke:var(--sigma-line);stroke-width:1.4;
+    stroke-dasharray:5 7;animation:flow 1.1s linear infinite;}
+  .flowline.dim{stroke:var(--line);stroke-dasharray:none;animation:none;}
+  .feedback{fill:none;stroke:var(--sigma);stroke-width:1.4;stroke-dasharray:3 6;
+    animation:flow 1.6s linear infinite;opacity:.8;}
+  @keyframes flow{to{stroke-dashoffset:-24;}}
+
+  /* ---------- modules ---------- */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);
+    margin-top:40px;border:1px solid var(--line);}
+  .mod{background:var(--steel);padding:26px 24px 28px;position:relative;transition:.22s ease;}
+  .mod::before,.mod::after{content:"";position:absolute;width:10px;height:10px;opacity:.5;transition:.22s;}
+  .mod::before{top:10px;right:10px;border-top:1px solid var(--ash);border-right:1px solid var(--ash);}
+  .mod::after{bottom:10px;left:10px;border-bottom:1px solid var(--ash);border-left:1px solid var(--ash);}
+  .mod:hover{background:#1A1F29;}
+  .mod:hover::before,.mod:hover::after{border-color:var(--sigma);opacity:1;}
+  .mod-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .mod-id{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.14em;color:var(--sigma);}
+  .chip{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--ash-2);
+    display:flex;align-items:center;gap:7px;text-transform:uppercase;}
+  .chip .d{width:6px;height:6px;border-radius:50%;background:var(--sigma);}
+  .mod h3{font-family:"Archivo",sans-serif;font-weight:800;font-size:21px;letter-spacing:-.01em;margin:0 0 4px;}
+  .mod .role{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--ash-2);margin-bottom:16px;letter-spacing:.04em;}
+  .mod ul{list-style:none;margin:0 0 18px;padding:0;}
+  .mod ul li{position:relative;padding-left:18px;font-size:14.5px;color:var(--bone);margin-bottom:8px;}
+  .mod ul li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:1px;background:var(--sigma);}
+  .mod .mesh{border-top:1px solid var(--line);padding-top:13px;font-size:12.5px;color:var(--ash-2);}
+  .mod .mesh b{color:var(--bone);font-weight:600;}
+  .mod .mesh .tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+    color:var(--sigma);text-transform:uppercase;display:block;margin-bottom:5px;}
+
+  /* ---------- pipeline ---------- */
+  .pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+    margin-top:40px;border:1px solid var(--line);}
+  .stage{background:var(--steel);padding:22px 16px;position:relative;}
+  .stage .num{font-family:"Space Mono",monospace;font-size:11px;color:var(--ash);letter-spacing:.1em;}
+  .stage .nm{font-family:"Archivo",sans-serif;font-weight:800;font-size:16px;margin:10px 0 6px;}
+  .stage .who{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--ash-2);letter-spacing:.04em;line-height:1.5;}
+  .stage .arrow{position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--sigma);
+    font-family:"Space Mono",monospace;z-index:2;}
+  .stage:last-child{background:#16243A;}
+  .stage:last-child .nm{color:var(--sigma);}
+
+  /* ---------- timeline ---------- */
+  .tl{margin-top:40px;border:1px solid var(--line);}
+  .tl-row{display:grid;grid-template-columns:170px 1fr;border-bottom:1px solid var(--line);}
+  .tl-row:last-child{border-bottom:0;}
+  .tl-when{padding:20px;background:var(--steel);font-family:"Space Mono",monospace;
+    font-size:12px;letter-spacing:.12em;color:var(--sigma);border-right:1px solid var(--line);text-transform:uppercase;}
+  .tl-what{padding:20px 22px;}
+  .tl-what h4{font-family:"Archivo",sans-serif;font-weight:800;font-size:16px;margin:0 0 6px;}
+  .tl-what p{margin:0;color:var(--ash-2);font-size:14.5px;}
+
+  /* ---------- conditions ---------- */
+  .cond{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+    margin-top:40px;border:1px solid var(--line);}
+  .cbox{background:var(--steel);padding:26px 22px;}
+  .cbox .k{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ash-2);margin-bottom:14px;}
+  .cbox .v{font-family:"Archivo",sans-serif;font-weight:900;font-size:30px;letter-spacing:-.01em;line-height:1.05;}
+  .cbox .v small{font-size:14px;font-weight:700;color:var(--ash-2);display:block;margin-top:4px;letter-spacing:0;}
+  .cbox .sug{font-family:"Space Mono",monospace;font-size:10px;color:var(--sigma);letter-spacing:.1em;margin-top:8px;}
+  .cond-note{margin-top:16px;font-size:13px;color:var(--ash);max-width:70ch;}
+  .cond-note b{color:var(--ash-2);}
+
+  /* ---------- closing ---------- */
+  .closing{padding:90px 0 40px;text-align:center;border-bottom:0;}
+  .closing .ready{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--lab);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+  .closing h2{font-family:"Archivo",sans-serif;font-weight:900;font-size:clamp(30px,5vw,52px);
+    letter-spacing:-.02em;line-height:1;margin:0 auto 20px;max-width:18ch;}
+  .closing p{color:var(--ash-2);max-width:54ch;margin:0 auto 36px;font-size:16.5px;}
+  .sig{display:flex;flex-wrap:wrap;justify-content:center;gap:0;border:1px solid var(--line);max-width:640px;margin:0 auto;}
+  .sig .cell{flex:1 1 200px;padding:18px 22px;border-right:1px solid var(--line);text-align:left;}
+  .sig .cell:last-child{border-right:0;}
+  .sig .k{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash);margin-bottom:8px;}
+  .sig .v{font-family:"Archivo",sans-serif;font-weight:700;font-size:15px;color:var(--bone);}
+
+  footer{padding:30px 0 60px;}
+  footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ash);}
+
+  @media(max-width:760px){
+    .grid{grid-template-columns:1fr;}
+    .pipe{grid-template-columns:1fr;}
+    .stage .arrow{display:none;}
+    .cond{grid-template-columns:1fr;}
+    .tl-row{grid-template-columns:1fr;}
+    .tl-when{border-right:0;border-bottom:1px solid var(--line);}
+    .hero .meta .cell{flex:1 1 50%;border-bottom:1px solid var(--line);}
+    .topbar .hide-s{display:none;}
+    .scrollhint{display:block;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .dot,.flowline,.feedback{animation:none!important;}
+  }
+  /* ---------- Zugriffssperre ---------- */
+  body.locked{overflow:hidden;}
+  body.locked .os-frame{display:none;}
+  #gate{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
+    background:var(--void);
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:64px 64px,64px 64px;}
+  body.locked #gate{display:flex;}
+  .gate-card{width:100%;max-width:380px;border:1.5px solid var(--lab);background:rgba(14,15,19,.94);padding:34px 30px 30px;position:relative;}
+  .gate-card::before,.gate-card::after{content:"";position:absolute;width:12px;height:12px;}
+  .gate-card::before{top:8px;right:8px;border-top:1px solid var(--lab);border-right:1px solid var(--lab);}
+  .gate-card::after{bottom:8px;left:8px;border-bottom:1px solid var(--lab);border-left:1px solid var(--lab);}
+  .gate-brand{display:flex;align-items:center;gap:10px;margin-bottom:26px;
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--bone);}
+  .gate-card .eyebrow{margin-bottom:14px;}
+  .gate-card h2{font-family:"Archivo",sans-serif;font-weight:800;font-size:23px;margin:0 0 6px;letter-spacing:-.01em;}
+  .gate-card>p{color:var(--ash-2);font-size:14px;margin:0 0 22px;}
+  .gate-card input{width:100%;background:var(--steel);border:1px solid var(--line);color:var(--bone);
+    font-family:"Space Mono",monospace;font-size:14px;letter-spacing:.06em;padding:13px 14px;outline:none;}
+  .gate-card input:focus{border-color:var(--sigma);}
+  .gate-card button{width:100%;margin-top:12px;background:var(--lab);color:#0E0F13;border:none;cursor:pointer;
+    font-family:"Space Mono",monospace;font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:13px;}
+  .gate-card button:hover{filter:brightness(1.08);}
+  .gate-err{color:#E0604F;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;
+    text-transform:uppercase;margin-top:14px;min-height:14px;}
+
+  /* ===================== NEWSLETTER (Creatix-Look) ===================== */
+  .nl-preview{display:flex;gap:13px;align-items:center;width:100%;margin-top:16px;padding:11px;
+    background:#101010;border:1px solid #2A2A2A;border-radius:14px;cursor:pointer;text-align:left;color:inherit;font-family:inherit;transition:.2s;}
+  .nl-preview:hover{border-color:#A6E83A;}
+  .nl-preview-thumb{width:66px;height:50px;flex:0 0 auto;border-radius:9px;border:1px solid #2A2A2A;
+    background:radial-gradient(120% 120% at 30% 20%,#242424 0%,#0C0C0C 100%);display:flex;align-items:center;justify-content:center;}
+  .nl-preview-thumb svg{width:42px;height:auto;}
+  .nl-preview-meta{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .nl-preview-tag{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#A6E83A;}
+  .nl-preview-title{font-size:13.5px;color:var(--bone);font-weight:600;}
+  .nl-preview-cta{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--ash-2);text-transform:uppercase;}
+
+  .nl-modal{position:fixed;inset:0;z-index:120;display:none;}
+  .nl-modal.open{display:block;}
+  .nl-backdrop{position:absolute;inset:0;background:rgba(4,4,4,.86);backdrop-filter:blur(4px);}
+  .nl-shell{position:relative;max-width:660px;margin:0 auto;height:100%;overflow-y:auto;padding:56px 16px 60px;}
+  .nl-close{position:fixed;top:18px;right:18px;z-index:2;background:#A6E83A;color:#0E0E0E;border:none;cursor:pointer;
+    font-family:"Space Mono",monospace;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:10px 15px;border-radius:30px;}
+  .nl-close:hover{filter:brightness(1.06);}
+
+  .nl-mail{background:#0E0E0E;color:#F2F2EE;font-family:"Inter",sans-serif;line-height:1.55;border-radius:22px;overflow:hidden;
+    box-shadow:0 30px 90px rgba(0,0,0,.6);border:1px solid #1E1E1E;}
+  .nl-mail *{box-sizing:border-box;}
+  .nl-top{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #1C1C1C;}
+  .nl-brand{font-family:"Fredoka",sans-serif;font-weight:700;font-size:19px;color:#fff;display:flex;align-items:center;gap:8px;}
+  .nl-brand em{font-style:normal;font-weight:400;color:#9C9C96;font-size:12px;letter-spacing:.16em;text-transform:uppercase;}
+  .nl-spark{color:#A6E83A;font-size:14px;}
+  .nl-issue{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:#9C9C96;}
+
+  .nl-hero{position:relative;padding:34px 24px 30px;background:radial-gradient(90% 120% at 85% -10%,rgba(166,232,58,.12) 0%,transparent 55%),#0E0E0E;}
+  .nl-hero-eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#A6E83A;margin-bottom:12px;}
+  .nl-h1{font-family:"Fredoka",sans-serif;font-weight:700;font-size:38px;line-height:1.02;margin:0 0 14px;color:#fff;letter-spacing:-.01em;}
+  .nl-hl{color:#A6E83A;}
+  .nl-lead{margin:0 0 22px;color:#B6B6B0;font-size:15px;max-width:46ch;}
+  .nl-cta{display:inline-block;background:#A6E83A;color:#0E0E0E;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:30px;}
+  .nl-cta:hover{filter:brightness(1.06);}
+  .nl-burst{position:absolute;top:24px;right:24px;color:#A6E83A;font-size:30px;opacity:.5;}
+
+  .nl-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#232323;margin:0 24px;border:1px solid #232323;border-radius:16px;overflow:hidden;}
+  .nl-stat{background:#141414;padding:16px 12px;text-align:center;}
+  .nl-stat b{display:block;font-family:"Fredoka",sans-serif;font-weight:600;font-size:21px;color:#fff;line-height:1.05;}
+  .nl-stat span{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#9C9C96;}
+
+  .nl-seg{padding:30px 24px 6px;}
+  .nl-seg-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .nl-seg-tag{font-family:"Fredoka",sans-serif;font-weight:600;font-size:15px;color:#0E0E0E;padding:6px 16px;border-radius:30px;}
+  .nl-seg--log .nl-seg-tag{background:#A6E83A;}
+  .nl-seg--prod .nl-seg-tag{background:#F4A23C;}
+  .nl-seg-rule{flex:1;height:1px;background:#242424;}
+
+  .nl-prop{background:#141414;border:1px solid #222;border-radius:18px;overflow:hidden;margin-bottom:18px;}
+  .nl-prop-media{position:relative;height:170px;display:flex;align-items:center;justify-content:center;
+    background-image:radial-gradient(120% 120% at 30% 15%,#242424 0%,#0C0C0C 100%),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 22px),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 22px);}
+  .nl-prop-media svg{width:172px;height:auto;}
+  .nl-prop-num{position:absolute;top:12px;left:15px;font-family:"Fredoka",sans-serif;font-weight:600;font-size:22px;color:#fff;opacity:.85;}
+  .nl-prop-spark{position:absolute;top:14px;right:16px;font-size:16px;color:#A6E83A;opacity:.75;}
+  .nl-seg--prod .nl-prop-spark{color:#F4A23C;}
+  .nl-prop-ph{position:absolute;bottom:12px;left:15px;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#A6E83A;}
+  .nl-seg--prod .nl-prop-ph{color:#F4A23C;}
+  .nl-prop-body{padding:18px 20px 20px;}
+  .nl-prop-loc{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8C8C86;margin-bottom:6px;}
+  .nl-prop-name{font-family:"Fredoka",sans-serif;font-weight:600;font-size:20px;margin:0 0 14px;color:#fff;}
+  .nl-spec{list-style:none;margin:0 0 18px;padding:0;}
+  .nl-spec li{position:relative;padding-left:18px;font-size:13.5px;color:#C4C4BE;margin-bottom:7px;}
+  .nl-spec li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:#A6E83A;}
+  .nl-seg--prod .nl-spec li::before{background:#F4A23C;}
+  .nl-spec b{color:#fff;}
+  .nl-prop-link{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-weight:600;font-size:13.5px;color:#0E0E0E;background:#A6E83A;padding:8px 10px 8px 18px;border-radius:30px;}
+  .nl-seg--prod .nl-prop-link{background:#F4A23C;}
+  .nl-arrow{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:50%;background:rgba(0,0,0,.16);}
+
+  .nl-map{padding:24px 24px 8px;}
+  .nl-map-title{font-family:"Fredoka",sans-serif;font-weight:600;font-size:20px;color:#fff;margin:0 0 4px;}
+  .nl-map-sub{font-size:13px;color:#9C9C96;margin:0 0 16px;}
+  .nl-map-card{background:#141414;border:1px solid #222;border-radius:18px;padding:18px 14px;}
+  .nl-map-card svg{display:block;width:100%;max-width:320px;height:auto;margin:0 auto;}
+  .nl-legend{display:flex;gap:24px;justify-content:center;margin-top:14px;font-size:12px;color:#C4C4BE;}
+  .nl-legend span{display:inline-flex;align-items:center;gap:8px;}
+  .nl-legend i{width:11px;height:11px;border-radius:50%;}
+
+  .nl-divider{display:flex;align-items:center;justify-content:center;gap:14px;padding:30px 24px;font-family:"Fredoka",sans-serif;font-weight:600;font-size:18px;color:#fff;}
+  .nl-divider i{color:#A6E83A;font-style:normal;font-size:13px;}
+
+  .nl-foot{background:#A6E83A;color:#0E0E0E;border-radius:22px;margin:6px 16px 16px;padding:32px 26px;}
+  .nl-foot-cta h2{font-family:"Fredoka",sans-serif;font-weight:700;font-size:30px;line-height:1.02;margin:0 0 10px;color:#0E0E0E;}
+  .nl-foot-cta p{margin:0 0 20px;font-size:14.5px;color:#1F2E0C;max-width:42ch;}
+  .nl-foot-btn{display:inline-block;background:#0E0E0E;color:#A6E83A;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:30px;}
+  .nl-foot-btn:hover{filter:brightness(1.18);}
+  .nl-foot-fine{margin-top:24px;padding-top:18px;border-top:1px solid rgba(0,0,0,.18);font-size:11.5px;color:#26350F;line-height:1.6;}
+  .nl-foot-fine b{color:#0E0E0E;} .nl-foot-fine a{color:#0E0E0E;text-decoration:underline;}
+
+  @media(max-width:520px){
+    .nl-h1{font-size:30px;}
+    .nl-stats{grid-template-columns:repeat(2,1fr);}
+    .nl-foot-cta h2{font-size:24px;}
+  }
+</style>
+</head>
+<body class="locked">
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-brand"><span class="dot"></span><span class="bw">Industrial<b>OS</b></span> · 24/7 Lab</div>
+    <p class="eyebrow">Zugriff gesperrt</p>
+    <h2>Vertrauliches Angebot</h2>
+    <p>Bitte Passwort eingeben, um das Angebot zu öffnen.</p>
+    <input id="pw" type="password" placeholder="Passwort" autocomplete="off" />
+    <button id="unlock">Entsperren</button>
+    <div class="gate-err" id="err"></div>
+  </div>
+</div>
+
+<div class="os-frame">
+
+<!-- ===== TOP STATUS BAR ===== -->
+<div class="topbar"><div class="wrap"><div class="row">
+  <span class="brandmark"><span class="dot"></span><span class="bw">Industrial<b>OS</b></span><span class="lab-chip">24/7 Lab</span></span>
+  <span class="hide-s">VERMIETUNGS-BETRIEBSSYSTEM · FÜR SIGMA HOLDING</span>
+  <span class="status-247">STATUS: AKTIV // 24/7</span>
+</div></div></div>
+
+<!-- ===== HERO ===== -->
+<header class="hero"><div class="wrap">
+  <p class="eyebrow">Phase 1 // Vermietungs-Offensive</p>
+  <h1>Kein Werkzeugkasten.<br>Ein <span class="hl">Betriebssystem</span> für volle Flächen.</h1>
+  <p class="lead">Fünf Module greifen ineinander und arbeiten auf ein Ziel: leere Industrieflächen kurz- bis mittelfristig vermieten. Ein Inhalt, einmal erzeugt, läuft durch alle Kanäle — gesteuert von Alexander Schweinle als Gesicht vor Ort.</p>
+  <div class="meta">
+    <div class="cell"><div class="k">Auftraggeber</div><div class="v">SIGMA Holding</div></div>
+    <div class="cell"><div class="k">Gesicht / Steuerung</div><div class="v">Alexander Schweinle</div></div>
+    <div class="cell"><div class="k">Auftrag</div><div class="v">Mieter-/Unternehmensakquise</div></div>
+    <div class="cell"><div class="k">Laufzeit Modul</div><div class="v">Phase 1 — ab Start</div></div>
+  </div>
+</div></header>
+
+<!-- ===== SCHEMATIC / SIGNATURE ===== -->
+<section><div class="wrap">
+  <p class="eyebrow">Systemarchitektur // wie die Module ineinandergreifen</p>
+  <h2 class="sec">Ein Kreislauf, kein Strohfeuer.</h2>
+  <p class="sec-sub">Objekte und Events liefern Rohmaterial. Daraus entsteht ein Content-Core, der durch LinkedIn, Newsletter und Paid Media läuft. Jeder Kanal erzeugt Leads — und jeder Abschluss wird zur nächsten Mieter-Story, die zurück in den Kreislauf fließt.</p>
+
+  <div class="schematic-shell">
+    <div class="schematic-head">
+      <span>FIG.01 — SIGNALFLUSS</span>
+      <span>EINMAL ERZEUGT · ÜBERALL AUSGESPIELT</span>
+    </div>
+    <div class="schematic-scroll">
+      <svg viewBox="0 0 1180 560" role="img" aria-label="Schaltbild: Rohmaterial fließt in den Content-Core, wird über Kanäle ausgespielt, erzeugt Leads und Mietverträge, die als Story zurückfließen.">
+        <defs>
+          <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0,0 L8,4.5 L0,9 Z" fill="#5E93DB"/>
+          </marker>
+        </defs>
+
+        <!-- feedback loop (drawn first, behind) -->
+        <path class="feedback" marker-end="url(#arr)"
+          d="M1095,150 C1095,30 360,18 250,168" />
+        <text x="640" y="34" class="n-label" text-anchor="middle" fill="#5E93DB">↺ MIETER-STORY ZURÜCK IN DEN CORE</text>
+
+        <!-- connectors: input -> core -->
+        <path class="flowline" marker-end="url(#arr)" d="M250,205 C360,205 380,245 470,255"/>
+        <path class="flowline" marker-end="url(#arr)" d="M250,360 C360,360 380,300 470,290"/>
+        <!-- core -> channels -->
+        <path class="flowline" marker-end="url(#arr)" d="M720,250 C800,235 815,180 905,178"/>
+        <path class="flowline" marker-end="url(#arr)" d="M720,272 C800,272 815,272 905,272"/>
+        <path class="flowline" marker-end="url(#arr)" d="M720,292 C800,308 815,366 905,368"/>
+        <!-- channels -> result bus -->
+        <path class="flowline" d="M1075,178 L1095,178"/>
+        <path class="flowline" d="M1075,272 L1095,272"/>
+        <path class="flowline" d="M1075,368 L1095,368"/>
+        <path class="flowline" d="M1095,178 L1095,479"/>
+        <path class="flowline" marker-end="url(#arr)" d="M1095,479 L1077,479"/>
+
+        <!-- INPUT NODES -->
+        <g>
+          <rect x="70" y="170" width="180" height="70" rx="3" fill="#202530" stroke="#2A2F3A"/>
+          <text x="86" y="196" class="n-label">IN_01 · ROHMATERIAL</text>
+          <text x="86" y="216" class="n-title">Objekte / Flächen</text>
+          <text x="86" y="232" class="n-sub">freie m² · Standortdaten</text>
+        </g>
+        <g>
+          <rect x="70" y="325" width="180" height="70" rx="3" fill="#202530" stroke="#2A2F3A"/>
+          <text x="86" y="351" class="n-label">IN_02 · ROHMATERIAL</text>
+          <text x="86" y="371" class="n-title">Events vor Ort</text>
+          <text x="86" y="387" class="n-sub">O-Töne · Video · Story</text>
+        </g>
+
+        <!-- CONTENT CORE -->
+        <g>
+          <rect x="470" y="195" width="250" height="150" rx="3" fill="#16273F" stroke="#5E93DB" stroke-width="1.4"/>
+          <text x="494" y="226" class="n-label" fill="#5E93DB">CORE · INHALTE</text>
+          <text x="494" y="252" class="n-title" font-size="19">Content-Core</text>
+          <text x="494" y="278" class="n-sub" fill="#9298A4">Freie Flächen · Mieter-Stories</text>
+          <text x="494" y="296" class="n-sub" fill="#9298A4">„Vom Handschlag zum Mietvertrag“</text>
+          <text x="494" y="314" class="n-sub" fill="#9298A4">Video mit Alex · 24/7-Besichtigung</text>
+          <rect x="494" y="324" width="120" height="2" fill="#5E93DB"/>
+        </g>
+
+        <!-- CHANNELS -->
+        <g>
+          <rect x="905" y="150" width="170" height="56" rx="3" fill="#171A20" stroke="#2A2F3A"/>
+          <text x="921" y="174" class="n-label">CH · ORGANISCH</text>
+          <text x="921" y="193" class="n-title" font-size="14">LinkedIn — Alex</text>
+        </g>
+        <g>
+          <rect x="905" y="244" width="170" height="56" rx="3" fill="#171A20" stroke="#2A2F3A"/>
+          <text x="921" y="268" class="n-label">CH · EIGENER KANAL</text>
+          <text x="921" y="287" class="n-title" font-size="14">Newsletter</text>
+        </g>
+        <g>
+          <rect x="905" y="340" width="170" height="56" rx="3" fill="#171A20" stroke="#2A2F3A"/>
+          <text x="921" y="364" class="n-label">CH · REICHWEITE</text>
+          <text x="921" y="383" class="n-title" font-size="14">Paid Media</text>
+        </g>
+
+        <!-- RESULT / FUNNEL OUTPUT -->
+        <g>
+          <rect x="905" y="436" width="170" height="86" rx="3" fill="#202530" stroke="#2A2F3A"/>
+          <text x="921" y="462" class="n-label">OUT · ERGEBNIS</text>
+          <text x="921" y="484" class="n-title" font-size="14">Leads</text>
+          <text x="921" y="502" class="n-sub" fill="#9298A4">→ Besichtigung 24/7</text>
+          <text x="921" y="517" class="n-sub" fill="#5E93DB">→ Mietvertrag</text>
+        </g>
+      </svg>
+    </div>
+    <div class="scrollhint">→ seitlich ziehen, um das ganze Schaltbild zu sehen</div>
+  </div>
+</div></section>
+
+<!-- ===== MODULES ===== -->
+<section><div class="wrap">
+  <p class="eyebrow">Laufende Prozesse // 5 Module</p>
+  <h2 class="sec">Die Bausteine im Betrieb.</h2>
+  <p class="sec-sub">Jedes Modul ist eigenständig wirksam — und jedes speist die anderen. Die Zeile „greift ineinander“ zeigt, wo das Modul andockt.</p>
+
+  <div class="grid">
+    <div class="mod">
+      <div class="mod-top"><span class="mod-id">MOD_01</span><span class="chip"><span class="d"></span>Aktiv</span></div>
+      <h3>LinkedIn</h3>
+      <div class="role">Profil Alexander Schweinle · organische Reichweite</div>
+      <ul>
+        <li>Profil voll auf Mieter-/Unternehmensakquise ausgerichtet</li>
+        <li>Alex als Gesicht: Beiträge in eigener Stimme statt Firmen-Werbung</li>
+        <li>Freie Flächen als Anlass-Posts plus Mieter-Stories „Vom Handschlag zum Mietvertrag“</li>
+        <li>Social Selling: passende Entscheider direkt per Nachricht ansprechen</li>
+      </ul>
+      <div class="mesh"><span class="tag">↔ greift ineinander</span>Liefert die <b>Creatives für Paid Media</b>, verlinkt den <b>Newsletter</b> und gibt dem System ein <b>Gesicht</b>.</div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-top"><span class="mod-id">MOD_02</span><span class="chip"><span class="d"></span>Aktiv</span></div>
+      <h3>Newsletter</h3>
+      <div class="role">Eigener Kanal · Versand alle 2 Monate</div>
+      <ul>
+        <li>Eigener Verteiler statt Algorithmus — Reichweite, die SIGMA gehört</li>
+        <li>Flächen-Update alle 2 Monate gebündelt: was frei ist, was frei wird</li>
+        <li>Segmentiert nach Region &amp; Branche für passgenaue Ansprache</li>
+        <li>„24/7-Besichtigung – Ihr Geschäft schläft nicht, wir auch nicht.“ als feste Rubrik</li>
+      </ul>
+      <div class="mesh"><span class="tag">↔ greift ineinander</span>Bündelt <b>LinkedIn- und Video-Inhalte</b> und hält die <b>Pipeline warm</b> zwischen den Touchpoints.</div>
+      <button class="nl-preview" onclick="openNL()" aria-label="Beispiel-Newsletter ansehen"><span class="nl-preview-thumb"><svg viewBox="0 0 170 96" fill="none" stroke="#A6E83A" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 80 H156" stroke="#3A3A3A"/><path d="M22 36 L60 20 H110 L148 36"/><rect x="26" y="36" width="118" height="44" rx="2"/><path d="M26 50 H144" stroke="#A6E83A" opacity="0.4"/><rect x="38" y="58" width="17" height="22" rx="2"/><rect x="63" y="58" width="17" height="22" rx="2"/><rect x="88" y="58" width="17" height="22" rx="2"/><rect x="113" y="58" width="14" height="22" rx="2"/></svg></span><span class="nl-preview-meta"><span class="nl-preview-tag">Beispiel · Flächen-Update</span><span class="nl-preview-title">Newsletter-Vorschau ansehen</span><span class="nl-preview-cta">Öffnen →</span></span></button>
+    </div>
+
+    <div class="mod">
+      <div class="mod-top"><span class="mod-id">MOD_03</span><span class="chip"><span class="d"></span>Aktiv</span></div>
+      <h3>Video-Format</h3>
+      <div class="role">Alex im Mittelpunkt · Ansprechpartner vor Ort</div>
+      <ul>
+        <li><b>Empfohlen:</b> Flächen-Walkthrough — Alex führt durch die freie Halle</li>
+        <li>Variante: „Frag Alex“ — kurze Antworten auf typische Mieterfragen</li>
+        <li>Variante: Mieter-Testimonial als Bewegtbild-Story</li>
+      </ul>
+      <div class="mesh"><span class="tag">↔ greift ineinander</span>Ein Dreh, viele Kanäle: zentrales <b>Asset für LinkedIn, Newsletter und Paid</b>.</div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-top"><span class="mod-id">MOD_04</span><span class="chip"><span class="d"></span>Aktiv</span></div>
+      <h3>Lokale Events</h3>
+      <div class="role">„Werkbank“ — Unternehmer-Frühstück in der Region</div>
+      <ul>
+        <li>SIGMA-eigenes Eventformat, anwendbar auf jedes Objekt</li>
+        <li>z. B. „Werkbank – Das Unternehmer-Frühstück“ als wiederkehrende Marke</li>
+        <li>Kombination aus Wissen (Fachimpuls) &amp; Austausch (Networking)</li>
+        <li>Mehrwert für die Gäste im Fokus — nicht die Präsentation der Halle</li>
+      </ul>
+      <div class="mesh"><span class="tag">↔ greift ineinander</span>Erzeugt <b>Rohmaterial</b> (O-Töne, Video, Story) und <b>qualifizierte Leads</b> — die Halle erleben die Gäste ganz nebenbei.</div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-top"><span class="mod-id">MOD_05</span><span class="chip"><span class="d"></span>Aktiv</span></div>
+      <h3>Paid Media</h3>
+      <div class="role">LinkedIn & Meta Ads · Reichweite & Targeting</div>
+      <ul>
+        <li>Spielt die erzeugten Inhalte aus (freie Flächen, Videos)</li>
+        <li>Geo- & Branchen-Targeting auf die Zielregionen</li>
+        <li>Lead-Formulare und Retargeting der Flächen-Interessenten</li>
+        <li><b>Media-Budget:</b> ca. 500–1.000 € / Monat, situativ mehr nach Absprache &amp; Dringlichkeit</li>
+      </ul>
+      <div class="mesh"><span class="tag">↔ greift ineinander</span>Verstärkt die <b>organische Reichweite</b> und <b>skaliert</b>, was nachweislich funktioniert.</div>
+    </div>
+
+    <div class="mod" style="display:flex;flex-direction:column;justify-content:center;background:#161A22;">
+      <div class="mod-id" style="margin-bottom:14px;">SYS · LOGIK</div>
+      <h3 style="font-size:24px;line-height:1.05;">Ein Inhalt.<br>Fünf Ausspielwege.</h3>
+      <p style="color:var(--ash-2);font-size:14.5px;margin:12px 0 0;">Produziert wird einmal — verteilt über alle Module. Das senkt Aufwand pro Kanal und hält die Botschaft konsistent: <b style="color:var(--bone);">freie Fläche, schnelle Besichtigung, Abschluss per Handschlag.</b></p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===== PIPELINE ===== -->
+<section><div class="wrap">
+  <p class="eyebrow">Signalfluss // vom Kontakt zum Mietvertrag</p>
+  <h2 class="sec">So wird Aufmerksamkeit zur Unterschrift.</h2>
+  <p class="sec-sub">Jede Stufe wird von bestimmten Modulen getragen — die Übergänge sind der Punkt, an dem das System greift.</p>
+  <div class="pipe">
+    <div class="stage"><div class="num">01</div><div class="nm">Aufmerksamkeit</div><div class="who">LinkedIn · Paid Media</div><div class="arrow">→</div></div>
+    <div class="stage"><div class="num">02</div><div class="nm">Interesse</div><div class="who">Video · Newsletter</div><div class="arrow">→</div></div>
+    <div class="stage"><div class="num">03</div><div class="nm">Besichtigung</div><div class="who">24/7 · Events</div><div class="arrow">→</div></div>
+    <div class="stage"><div class="num">04</div><div class="nm">Handschlag</div><div class="who">Alex vor Ort</div><div class="arrow">→</div></div>
+    <div class="stage"><div class="num">05</div><div class="nm">Mietvertrag</div><div class="who">Abschluss · neue Story</div></div>
+  </div>
+</div></section>
+
+<!-- ===== TIMELINE ===== -->
+<section><div class="wrap">
+  <p class="eyebrow">Boot-Sequenz // Phase 1 Ablauf</p>
+  <h2 class="sec">Hochfahren in drei Schritten.</h2>
+  <div class="tl">
+    <div class="tl-row">
+      <div class="tl-when">Woche 1–3<br>SETUP</div>
+      <div class="tl-what"><h4>System aufsetzen</h4><p>LinkedIn-Profil schärfen, Content-Core anlegen, Newsletter-System & Verteiler einrichten, Tracking aufsetzen, Eventfahrplan und erstes Video-Briefing.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-when">Ab Woche 4<br>LIVE</div>
+      <div class="tl-what"><h4>Kanäle scharf schalten</h4><p>LinkedIn-Takt startet, erster Dreh mit Alex, erster Newsletter-Versand, Paid-Kampagnen mit den ersten Flächen- und Video-Inhalten.</p></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-when">Laufend<br>BETRIEB</div>
+      <div class="tl-what"><h4>Drehen am Schwungrad</h4><p>Events durchführen, Leads in Besichtigungen überführen, Abschlüsse zu neuen Mieter-Stories machen, anhand der Daten verstärken, was funktioniert.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===== CONDITIONS ===== -->
+<section><div class="wrap">
+  <p class="eyebrow">Konditionen // Systembetrieb</p>
+  <h2 class="sec">Modell: Retainer + Erfolg.</h2>
+  <div class="cond">
+    <div class="cbox">
+      <div class="k">Setup &amp; Strategie</div>
+      <div class="v">1.500 €<small>netto · einmalig</small></div>
+    </div>
+    <div class="cbox">
+      <div class="k">Laufender Retainer</div>
+      <div class="v">2.000 €<small>netto / Monat</small></div>
+    </div>
+    <div class="cbox">
+      <div class="k">Erfolgsbeteiligung</div>
+      <div class="v">0,5×<small>Nettomonatsmiete je Mietvertrag</small></div>
+    </div>
+  </div>
+  <p class="cond-note"><b>Laufzeit:</b> mindestens 6 Monate. Alle Beträge netto zzgl. USt. Externe Kosten (Eventlocation, Produktion, Versanddienst, Anzeigenbudget) nach Absprache gesondert. Setup- und Retainer-Werte im Detail abstimmbar.</p>
+</div></section>
+
+<!-- ===== CLOSING ===== -->
+<section class="closing"><div class="wrap">
+  <span class="ready"><span class="dot"></span>System bereit — wartet auf Freigabe</span>
+  <h2>Drücken wir auf Start?</h2>
+  <p>Mit Freigabe halten wir Setup, Retainer und Startdatum kurz fest und fahren Phase 1 hoch. Anpassungen am Zuschnitt jederzeit möglich.</p>
+  <div class="sig">
+    <div class="cell"><div class="k">Anbieter</div><div class="v">[ Dein Name / Firma ]</div></div>
+    <div class="cell"><div class="k">Freigabe SIGMA Holding</div><div class="v">Alexander Schweinle</div></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><div class="row">
+  <span class="foot-brand">INDUSTRIALOS · 24/7 LAB</span>
+  <span>PHASE 1 / 6 · VERTRAULICH</span>
+</div></div></footer>
+
+</div><!-- /os-frame -->
+
+<div id="nl-modal" class="nl-modal"><div class="nl-backdrop" onclick="closeNL()"></div><div class="nl-shell" role="dialog" aria-modal="true" aria-label="Beispiel-Newsletter"><button class="nl-close" onclick="closeNL()">✕ Schließen</button><div class="nl-mail"><div class="nl-top"><div class="nl-brand"><span class="nl-spark">✦</span>SIGMA <em>Holding</em></div><div class="nl-issue">FLÄCHEN-UPDATE · 2026</div></div><div class="nl-hero"><div class="nl-hero-eyebrow">Direkt vom Eigentümer</div><h1 class="nl-h1">Freie Flächen.<br><span class="nl-hl">Sofort verfügbar.</span></h1><p class="nl-lead">Ihr Geschäft schläft nicht, wir auch nicht — Besichtigung 24/7 nach Absprache. Sortiert nach Ihrem Bedarf: Logistik und Produktion.</p><a class="nl-cta" href="#">Alle Flächen ansehen →</a><span class="nl-burst">❈</span></div><div class="nl-stats"><div class="nl-stat"><b>4</b><span>Objekte</span></div><div class="nl-stat"><b>65.700 m²</b><span>Hallenfläche</span></div><div class="nl-stat"><b>2</b><span>Segmente</span></div><div class="nl-stat"><b>24/7</b><span>Besichtigung</span></div></div><div class="nl-seg nl-seg--log"><div class="nl-seg-head"><span class="nl-seg-tag">Logistik</span><span class="nl-seg-rule"></span></div><div class="nl-prop"><div class="nl-prop-media"><svg viewBox="0 0 170 96" fill="none" stroke="#A6E83A" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 80 H156" stroke="#3A3A3A"/><path d="M22 36 L60 20 H110 L148 36"/><rect x="26" y="36" width="118" height="44" rx="2"/><path d="M26 50 H144" stroke="#A6E83A" opacity="0.4"/><rect x="38" y="58" width="17" height="22" rx="2"/><rect x="63" y="58" width="17" height="22" rx="2"/><rect x="88" y="58" width="17" height="22" rx="2"/><rect x="113" y="58" width="14" height="22" rx="2"/></svg><span class="nl-prop-num">01</span><span class="nl-prop-spark">✦</span><span class="nl-prop-ph">Platzhalter · Logistikimmobilie</span></div><div class="nl-prop-body"><div class="nl-prop-loc">Nordhausen · Thüringen</div><h3 class="nl-prop-name">Lager &amp; Logistik mit PV-Dach</h3><ul class="nl-spec"><li><b>11.200 m²</b> Lager- &amp; Produktionsfläche</li><li><b>20.500 m²</b> Grundstück</li><li>Hallenhöhe 5–7 m · 8 Tore, 3 Rampen</li><li>800 kWp PV-Anlage auf dem Dach</li></ul><a class="nl-prop-link" href="#">Fläche anfragen <span class="nl-arrow">→</span></a></div></div><div class="nl-prop"><div class="nl-prop-media"><svg viewBox="0 0 170 96" fill="none" stroke="#A6E83A" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 80 H156" stroke="#3A3A3A"/><path d="M22 36 L60 20 H110 L148 36"/><rect x="26" y="36" width="118" height="44" rx="2"/><path d="M26 50 H144" stroke="#A6E83A" opacity="0.4"/><rect x="38" y="58" width="17" height="22" rx="2"/><rect x="63" y="58" width="17" height="22" rx="2"/><rect x="88" y="58" width="17" height="22" rx="2"/><rect x="113" y="58" width="14" height="22" rx="2"/></svg><span class="nl-prop-num">02</span><span class="nl-prop-spark">✦</span><span class="nl-prop-ph">Platzhalter · Logistikimmobilie</span></div><div class="nl-prop-body"><div class="nl-prop-loc">Bad Lobenstein · Thüringen</div><h3 class="nl-prop-name">Großindustrie mit Logistik</h3><ul class="nl-spec"><li><b>38.000 m²</b> Hallenfläche</li><li><b>160.000 m²</b> Grundstück</li><li>Hallenhöhe 6–13 m · jede Halle min. 1 Tor</li><li>Baujahr 2000–2016</li></ul><a class="nl-prop-link" href="#">Fläche anfragen <span class="nl-arrow">→</span></a></div></div></div><div class="nl-seg nl-seg--prod"><div class="nl-seg-head"><span class="nl-seg-tag">Produktion</span><span class="nl-seg-rule"></span></div><div class="nl-prop"><div class="nl-prop-media"><svg viewBox="0 0 170 96" fill="none" stroke="#F4A23C" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 80 H156" stroke="#3A3A3A"/><path d="M22 36 L60 20 H110 L148 36"/><rect x="26" y="36" width="118" height="44" rx="2"/><path d="M26 50 H144" stroke="#F4A23C" opacity="0.4"/><rect x="38" y="58" width="17" height="22" rx="2"/><rect x="63" y="58" width="17" height="22" rx="2"/><rect x="88" y="58" width="17" height="22" rx="2"/><rect x="113" y="58" width="14" height="22" rx="2"/></svg><span class="nl-prop-num">03</span><span class="nl-prop-spark">✦</span><span class="nl-prop-ph">Platzhalter · Industriehalle</span></div><div class="nl-prop-body"><div class="nl-prop-loc">Pforzheim · Baden-Württemberg</div><h3 class="nl-prop-name">Produktion für Anlagen &amp; Maschinen</h3><ul class="nl-spec"><li><b>8.500 m²</b> Hallenfläche</li><li><b>35.000 m²</b> Grundstück</li><li>Direkt an der A8</li><li>Mehrere Portalkräne · 3 Trafos</li></ul><a class="nl-prop-link" href="#">Fläche anfragen <span class="nl-arrow">→</span></a></div></div><div class="nl-prop"><div class="nl-prop-media"><svg viewBox="0 0 170 96" fill="none" stroke="#F4A23C" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 80 H156" stroke="#3A3A3A"/><path d="M22 36 L60 20 H110 L148 36"/><rect x="26" y="36" width="118" height="44" rx="2"/><path d="M26 50 H144" stroke="#F4A23C" opacity="0.4"/><rect x="38" y="58" width="17" height="22" rx="2"/><rect x="63" y="58" width="17" height="22" rx="2"/><rect x="88" y="58" width="17" height="22" rx="2"/><rect x="113" y="58" width="14" height="22" rx="2"/></svg><span class="nl-prop-num">04</span><span class="nl-prop-spark">✦</span><span class="nl-prop-ph">Platzhalter · Industriehalle</span></div><div class="nl-prop-body"><div class="nl-prop-loc">St. Georgen · Schwarzwald</div><h3 class="nl-prop-name">Hochpräzise Fertigung</h3><ul class="nl-spec"><li><b>8.000 m²</b> Hallenfläche</li><li><b>17.000 m²</b> Grundstück</li><li>Hallenhöhe 7 m</li><li>Andienung: zwei Rampen</li></ul><a class="nl-prop-link" href="#">Fläche anfragen <span class="nl-arrow">→</span></a></div></div></div><div class="nl-map"><div class="nl-map-title">Wo die Flächen liegen</div><p class="nl-map-sub">Vier Standorte in Thüringen und Baden-Württemberg — farblich nach Segment.</p><div class="nl-map-card"><svg viewBox="0 0 600 760" xmlns="http://www.w3.org/2000/svg"><path d="M234,63 L474,89 L534,170 L552,241 L570,367 L546,411 L450,447 L420,456 L498,590 L450,644 L444,697 L360,715 L282,724 L222,706 L126,706 L66,560 L36,492 L30,385 L72,322 L90,259 L102,197 L180,170 L168,134 L186,98 Z" fill="#1C1C1C" stroke="#3A3A3A" stroke-width="2"/><circle cx="317" cy="358" r="12" fill="#A6E83A" stroke="#0E0E0E" stroke-width="3"/><text x="335" y="364" font-family="Inter,sans-serif" font-size="19" font-weight="700" fill="#F2F2EE" text-anchor="start">Nordhausen</text><circle cx="368" cy="452" r="12" fill="#A6E83A" stroke="#0E0E0E" stroke-width="3"/><text x="386" y="458" font-family="Inter,sans-serif" font-size="19" font-weight="700" fill="#F2F2EE" text-anchor="start">Bad Lobenstein</text><circle cx="192" cy="591" r="12" fill="#F4A23C" stroke="#0E0E0E" stroke-width="3"/><text x="174" y="597" font-family="Inter,sans-serif" font-size="19" font-weight="700" fill="#F2F2EE" text-anchor="end">Pforzheim</text><circle cx="170" cy="659" r="12" fill="#F4A23C" stroke="#0E0E0E" stroke-width="3"/><text x="152" y="665" font-family="Inter,sans-serif" font-size="19" font-weight="700" fill="#F2F2EE" text-anchor="end">St. Georgen</text></svg><div class="nl-legend"><span><i style="background:#A6E83A"></i>Logistik</span><span><i style="background:#F4A23C"></i>Produktion</span></div></div></div><div class="nl-divider">Logistik <i>✦</i> Produktion <i>✦</i> 24/7</div><div class="nl-foot"><div class="nl-foot-cta"><h2>Fläche gefunden?<br>Sprechen wir.</h2><p>Direkt vom Eigentümer — kurze Entscheidungswege, Besichtigung 24/7.</p><a class="nl-foot-btn" href="#">Kontakt aufnehmen →</a></div><div class="nl-foot-fine"><b>SIGMA Holding</b> · [Anschrift] · [Telefon] · [E-Mail]<br>Beispiel-Vorschau dieses Flächen-Updates. · <a href="#">Abmelden</a></div></div></div></div></div>
+
+<script>
+(function(){
+  var PW="Macher2025";
+  var b=document.body;
+  var inp=document.getElementById("pw"),
+      btn=document.getElementById("unlock"),
+      err=document.getElementById("err");
+  function tryUnlock(){
+    if(inp.value===PW){ b.classList.remove("locked"); }
+    else{ err.textContent="Falsches Passwort"; inp.value=""; inp.focus(); }
+  }
+  btn.addEventListener("click",tryUnlock);
+  inp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); tryUnlock(); } });
+  inp.focus();
+})();
+function openNL(){document.getElementById("nl-modal").classList.add("open");document.body.style.overflow="hidden";}function closeNL(){document.getElementById("nl-modal").classList.remove("open");document.body.style.overflow="";}document.addEventListener("keydown",function(e){if(e.key==="Escape")closeNL();});
+</script>
+
+</body>
+</html>
